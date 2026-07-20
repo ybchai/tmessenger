@@ -4,7 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "node --watch src/server.js"
+    "build": "shx rm -rf dist && shx cp -r src dist",
+    "dev": "node --watch src/server.js",
+    "start": "node dist/server.js"
   },
   "keywords": [],
   "author": "",
@@ -17,5 +19,8 @@
     "express": "^5.2.1",
     "mongoose": "^9.7.4",
     "pg": "^8.22.0"
+  },
+  "devDependencies": {
+    "shx": "^0.4.0"
   }
 }
