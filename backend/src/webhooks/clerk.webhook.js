@@ -37,8 +37,6 @@ router.post("/", async (req, res) => {
         u.username ||
         email?.split("@")[0];
 
-      console.log(`Webhook ${evt.type}:`, { clerkId: u.id, email, fullName });
-
       await User.findOneAndUpdate(
         { clerkId: u.id },
         { clerkId: u.id, email, fullName, profilePic: u.image_url },

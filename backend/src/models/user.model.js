@@ -7,21 +7,21 @@ const userSchema = new mongoose.Schema(
       required: true,
       unique: true,
     },
-    fullName: {
-      type: String,
-      required: true,
-    },
     email: {
       type: String,
       required: true,
       unique: true,
+    },
+    fullName: {
+      type: String,
+      required: true,
     },
     profilePic: {
       type: String,
       default: "",
     },
   },
-  { timestamps: true },
+  { timestamps: true }, // createdAt & updatedAt
 );
 
 const User = mongoose.model("User", userSchema);

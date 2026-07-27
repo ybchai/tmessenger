@@ -5,15 +5,17 @@ export async function connectDB() {
     const mongoUri = process.env.MONGO_URI;
 
     if (!mongoUri) {
-      console.error("MONGO_URI is not defined");
-      process.exit(1);
+      throw new Error("MONGO_URI is required");
     }
+
     const conn = await mongoose.connect(mongoUri);
-    console.log("Connected to database", conn.connection.host);
+
+    console.log("MongoDB connected", conn.connection.host);
   } catch (error) {
-    console.error("Error connecting to database:", error);
+    console.error("MongoDB connection error:", error.message);
     process.exit(1);
-    // 1 means failure, 0 means success
+    // 1 means failed, 0 means success
   }
 }
 
+export default connectDB;
