@@ -75,4 +75,4 @@ async function runMigration() {
 }
 
 // run the migration
-module.exports = runMigration;
+export default runMigration
