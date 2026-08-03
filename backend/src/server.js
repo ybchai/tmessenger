@@ -41,6 +41,12 @@ app.get("/health", (req, res) => {
   res.status(200).json({ ok: true });
 });
 
+app._router.stack.forEach((r) => {
+  if (r.route) {
+    console.log(r.route.path);
+  }
+});
+
 // API routes
 app.use("/api/auth", authRoutes);
 app.use("/api/conversations", conversationRoutes);

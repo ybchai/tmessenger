@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "shx rm -rf dist && mkdir dist && cp -R src/. dist/",
+    "build": "shx rm -rf dist && shx cp -r src dist",
     "dev": "node --watch src/server.js",
     "start": "node dist/server.js",
     "migrate": "node src/database/migrate.js"
