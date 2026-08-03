@@ -27,7 +27,7 @@ export async function findUserByClerkId(clerkId) {
   return result.rows[0];
 }
 export async function upsertUser({ clerkId, email, fullName, profilePic }) {
-  const result = await pool.query(
+  const result = await query(
     `
         INSERT INTO users
         (
