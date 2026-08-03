@@ -6,6 +6,7 @@ import { findUserByClerkId, upsertUser, deactivateUserByClerkId } from "../repos
 const router = express.Router();
 
 router.post("/", async (req, res) => {
+  console.log("CLERK WEBHOOK HIT");
   try {
     const signingSecret = process.env.CLERK_WEBHOOK_SIGNING_SECRET;
 
