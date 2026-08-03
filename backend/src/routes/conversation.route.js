@@ -4,7 +4,7 @@ import {
   createOrGetConversation,
   getConversations,
   getParticipants,
-} from "./controllers/conversation.controller.js";
+} from "../controllers/conversation.controller.js";
 
 import { protectRoute } from "../middleware/auth.middleware.js";
 
