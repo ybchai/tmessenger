@@ -12,10 +12,18 @@ export const useAuthStore = create((set, get) => ({
 
   socket: null,
 
-  connectSocket: () => {
+  // connect socket after PostgreSQL user is loaded
+  connectSocket: (user) => {
+    if (!user) return;
+
+    // prevent duplicate connections
     if (get().socket?.connected) return;
 
     const socket = io(BASE_URL, {
+      query: {
+        userId: user.id,
+      },
+
       withCredentials: true,
     });
 
@@ -34,5 +42,42 @@ export const useAuthStore = create((set, get) => ({
     set({
       socket: null,
     });
+  },
+
+  checkAuth: async () => {
+    set({
+      isCheckingAuth: true,
+    });
+
+    try {
+      const res = await axiosInstance.get("/auth/check");
+
+      const user = res.data;
+
+      set({
+        authUser: user,
+      });
+
+      // connect realtime after auth success
+      get().connectSocket(user);
+    } catch (error) {
+      console.error("Auth check failed:", error.message);
+
+      set({
+        authUser: null,
+      });
+    } finally {
+      set({
+        isCheckingAuth: false,
+      });
+    }
+  },
+
+  clearAuth: () => {
+    set({
+      authUser: null,
+    });
+
+    get().disconnectSocket();
   },
 }));
