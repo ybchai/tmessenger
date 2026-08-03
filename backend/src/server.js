@@ -23,10 +23,10 @@ const FRONTEND_URL = process.env.FRONTEND_URL;
 const publicDir = path.join(process.cwd(), "public");
 
 // it's important that you don't parse the webhook event data, it should be in the raw format
-app.use(
+app.post(
   "/api/webhooks/clerk",
   express.raw({ type: "application/json" }),
-  clerkWebhook,
+  clerkWebhook
 );
 
 app.use(express.json());

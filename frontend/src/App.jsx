@@ -11,6 +11,7 @@ import { useEffect, useState } from "react";
 import { Toaster } from "react-hot-toast";
 
 function App() {
+  console.log("AUTH STORE:", useAuthStore.getState());
   const { isSignedIn, isLoaded } = useAuth();
 
   const clearAuth = useAuthStore((state) => state.clearAuth);
@@ -30,7 +31,12 @@ function App() {
     <ThemeProvider>
       <WallpaperProvider>
         <Routes>
-          <Route path="/" element={isSignedIn ? <ChatPage /> : <Navigate to={"/auth"} replace />} />
+          <Route
+            path="/"
+            element={
+              isSignedIn ? <ChatPage /> : <Navigate to={"/auth"} replace />
+            }
+          />
           <Route
             path="/auth"
             element={!isSignedIn ? <AuthPage /> : <Navigate to={"/"} replace />}
