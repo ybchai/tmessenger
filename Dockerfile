@@ -22,6 +22,7 @@ COPY backend/package.json backend/package-lock.json ./
 RUN npm install --no-audit --no-fund
 COPY backend/ ./
 RUN npm run build
+RUN echo "===== DIST =====" && find dist -maxdepth 3 -type f
 
 # --- Stage 3: runtime image (only prod deps + built assets) ---
 # Express serves API routes and static files from public/.
