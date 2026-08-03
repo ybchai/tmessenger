@@ -1,5 +1,5 @@
 import { getAuth } from "@clerk/express";
-import { findUserByClerkId } from "../users/user.repository.js";
+import { findUserByClerkId } from "../repositories/user.repository.js";
 
 export async function protectRoute(req, res, next) {
   try {

@@ -1,4 +1,4 @@
-import { query } from "../../shared/database/connection.js";
+import { query } from "../database/connection.js";
 import { ulid } from "ulid";
 
 export async function findDirectConversation(userId1, userId2) {

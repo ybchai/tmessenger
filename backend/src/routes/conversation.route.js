@@ -4,9 +4,9 @@ import {
   createOrGetConversation,
   getConversations,
   getParticipants,
-} from "./conversation.controller.js";
+} from "./controllers/conversation.controller.js";
 
-import { protectRoute } from "../auth/auth.middleware.js";
+import { protectRoute } from "../middleware/auth.middleware.js";
 
 const router = express.Router();
 

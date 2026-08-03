@@ -1,7 +1,7 @@
 import express from "express";
 import { verifyWebhook } from "@clerk/backend/webhooks";
 
-import { upsertUser, deactivateUserByClerkId } from "../users/user.repository.js";
+import { findUserByClerkId, upsertUser, deactivateUserByClerkId } from "../repositories/user.repository.js";
 
 const router = express.Router();
 

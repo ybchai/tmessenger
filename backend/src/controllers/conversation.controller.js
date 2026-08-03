@@ -3,7 +3,7 @@ import {
   createConversation,
   getUserConversations,
   getConversationParticipants,
-} from "./conversation.repository.js";
+} from "../repositories/conversation.repository.js";
 
 /*
     Create or get existing DM conversation

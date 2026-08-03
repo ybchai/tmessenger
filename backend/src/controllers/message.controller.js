@@ -1,7 +1,7 @@
 import {
   getMessagesByConversation,
   createMessage,
-} from "./message.repository.js";
+} from "../repositories/message.repository.js";
 
 import { hasImageKitConfig, uploadChatMedia } from "../../shared/imagekit.js";
 
