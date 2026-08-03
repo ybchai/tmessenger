@@ -1,14 +1,27 @@
 import express from "express";
 import { verifyWebhook } from "@clerk/backend/webhooks";
 
-import { findUserByClerkId, upsertUser, deactivateUserByClerkId } from "../repositories/user.repository.js";
+import {
+  upsertUser,
+  deactivateUserByClerkId,
+} from "../repositories/user.repository.js";
 
 const router = express.Router();
 
 router.post("/", async (req, res) => {
   console.log("CLERK WEBHOOK HIT");
+
   try {
     const signingSecret = process.env.CLERK_WEBHOOK_SIGNING_SECRET;
+
+    console.log({
+      secretExists: Boolean(signingSecret),
+      svixId: req.headers["svix-id"],
+      svixSignature: req.headers["svix-signature"],
+      svixTimestamp: req.headers["svix-timestamp"],
+      bodyType: typeof req.body,
+      isBuffer: Buffer.isBuffer(req.body),
+    });
 
     if (!signingSecret) {
       return res.status(503).json({
@@ -16,29 +29,17 @@ router.post("/", async (req, res) => {
       });
     }
 
-    // Clerk requires the raw request body
-    const payload = Buffer.isBuffer(req.body)
-      ? req.body.toString("utf8")
-      : String(req.body);
-
     const request = new Request("http://internal/webhooks/clerk", {
       method: "POST",
 
       headers: new Headers(req.headers),
 
-      body: payload,
+      body: req.body,
     });
-
-    // Verify webhook authenticity
 
     const evt = await verifyWebhook(request, {
       signingSecret,
     });
-
-    /*
-      Handle new user creation
-      and user profile updates
-    */
 
     if (evt.type === "user.created" || evt.type === "user.updated") {
       const u = evt.data;
@@ -54,23 +55,14 @@ router.post("/", async (req, res) => {
 
       await upsertUser({
         clerkId: u.id,
-
         email,
-
         fullName,
-
         profilePic: u.image_url ?? "",
       });
     }
 
-    /*
-      Handle user deletion
-    */
-
     if (evt.type === "user.deleted") {
-      if (evt.data.id) {
-        await deactivateUserByClerkId(evt.data.id);
-      }
+      await deactivateUserByClerkId(evt.data.id);
     }
 
     return res.status(200).json({
