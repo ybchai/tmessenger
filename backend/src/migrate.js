@@ -1,4 +1,4 @@
-const runMigration = require("./database/migrate.js");
+import runMigration from "./database/migrate.js";
 
 runMigration()
     .then(()=>{
