@@ -15,6 +15,11 @@ router.post("/", async (req, res) => {
     const signingSecret = process.env.CLERK_WEBHOOK_SIGNING_SECRET;
 
     console.log({
+      secretExists: Boolean(process.env.CLERK_WEBHOOK_SIGNING_SECRET),
+      secretStart: process.env.CLERK_WEBHOOK_SIGNING_SECRET?.slice(0, 10),
+    });
+
+    console.log({
       secretExists: Boolean(signingSecret),
       svixId: req.headers["svix-id"],
       svixSignature: req.headers["svix-signature"],
@@ -31,10 +36,8 @@ router.post("/", async (req, res) => {
 
     const request = new Request("http://internal/webhooks/clerk", {
       method: "POST",
-
       headers: new Headers(req.headers),
-
-      body: req.body,
+      body: Buffer.isBuffer(req.body) ? req.body : JSON.stringify(req.body),
     });
 
     const evt = await verifyWebhook(request, {
