@@ -21,8 +21,16 @@ WORKDIR /app
 COPY backend/package.json backend/package-lock.json ./
 RUN npm install --no-audit --no-fund
 COPY backend/ ./
+# Debug Source
+RUN echo "===== SOURCE DATABASE =====" 
+RUN ls -la src/database 
+RUN ls -la src/database/migrations
 RUN npm run build
-RUN echo "===== DIST =====" && find dist -maxdepth 3 -type f
+
+#Debug DIST
+RUN echo "===== DIST DATABASE =====" 
+RUN ls -la dist/database
+RUN ls -la dist/database/migrations
 
 # --- Stage 3: runtime image (only prod deps + built assets) ---
 # Express serves API routes and static files from public/.
