@@ -3,7 +3,7 @@ import {
   createMessage,
 } from "../repositories/message.repository.js";
 
-import { hasImageKitConfig, uploadChatMedia } from "../../shared/imagekit.js";
+import { hasImageKitConfig, uploadChatMedia } from "../lib/imagekit.js";
 
 export async function getMessages(req, res) {
   try {
