@@ -14,6 +14,7 @@ import job from "./lib/cron.js";
 import clerkWebhook from "./webhooks/clerk.webhook.js";
 import authRoutes from "./routes/auth.route.js";
 import messageRoutes from "./routes/message.route.js";
+import conversationRoutes from "./routes/conversation.route.js";
 import { app, server } from "./lib/socket.js";
 
 const PORT = process.env.PORT;
@@ -33,6 +34,7 @@ app.get("/health", (req, res) => {
 });
 
 app.use("/api/auth", authRoutes);
+app.use("/api/conversations", conversationRoutes);
 app.use("/api/messages", messageRoutes);
 
 // if the public directory exists, serve the static files

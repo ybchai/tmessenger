@@ -3,32 +3,45 @@ import http from "http";
 import { Server } from "socket.io";
 
 const app = express();
+
 const server = http.createServer(app);
 
 const allowedOrigin = process.env.FRONTEND_URL || "http://localhost:5173";
 
-const io = new Server(server, { cors: { origin: [allowedOrigin] } });
+const io = new Server(server, {
+  cors: {
+    origin: allowedOrigin,
 
-function getReceiverSocketId(userId) {
-  return userSocketMap[userId];
-}
-
-// online users map = { userId: socketId }
-const userSocketMap = {};
+    credentials: true,
+  },
+});
 
 io.on("connection", (socket) => {
-  const userId = socket.handshake.query.userId;
+  console.log("User connected:", socket.id);
 
-  if (userId) userSocketMap[userId] = socket.id;
+  socket.on("joinConversation", (conversationId) => {
+    socket.join(conversationId);
 
-  // io.emit() sends event to everyone - broadcast
-  io.emit("getOnlineUsers", Object.keys(userSocketMap));
+    console.log(
+      `${socket.id}
+                    joined conversation
+                    ${conversationId}`,
+    );
+  });
 
-  // socket.on is used to listen for events
+  socket.on("leaveConversation", (conversationId) => {
+    socket.leave(conversationId);
+
+    console.log(
+      `${socket.id}
+                    left conversation
+                    ${conversationId}`,
+    );
+  });
+
   socket.on("disconnect", () => {
-    if (userId) delete userSocketMap[userId];
-    io.emit("getOnlineUsers", Object.keys(userSocketMap));
+    console.log("User disconnected:", socket.id);
   });
 });
 
-export { app, server, io, getReceiverSocketId };
+export { app, server, io };

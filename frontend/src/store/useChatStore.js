@@ -11,7 +11,7 @@ export const useChatStore = create(
       users: [],
       conversations: [],
       messages: [],
-      selectedUser: null,
+      selectedConversation: null,
       isConversationsLoading: false,
       isUsersLoading: false,
       isMessagesLoading: false,
@@ -44,7 +44,7 @@ export const useChatStore = create(
       getConversations: async () => {
         set({ isConversationsLoading: true });
         try {
-          const res = await axiosInstance.get("/messages/conversations");
+          const res = await axiosInstance.get("/conversations");
           set({ conversations: res.data });
         } catch (error) {
           console.log("Error in getConversations", error.message);
@@ -53,61 +53,74 @@ export const useChatStore = create(
         }
       },
 
-      getMessages: async (userId) => {
-        if (!userId) return;
-        set({ isMessagesLoading: true });
+      getMessages: async (conversationId) => {
+        if (!conversationId) return;
+
+        set({
+          isMessagesLoading: true,
+        });
+
         try {
-          const res = await axiosInstance.get(`/messages/${userId}`);
-          set({ messages: res.data });
+          const res = await axiosInstance.get(`/messages/${conversationId}`);
+
+          set({
+            messages: res.data,
+          });
         } catch (error) {
-          toast.error(
-            error.response?.data?.message || "Failed to load messages",
-          );
+          toast.error("Failed to load messages");
         } finally {
-          set({ isMessagesLoading: false });
+          set({
+            isMessagesLoading: false,
+          });
         }
       },
 
-      sendMessage: async (messageData) => {
-        const { selectedUser, messages } = get();
-        if (!selectedUser) return false;
-
+      sendMessage: async ({ conversationId, data }) => {
         try {
           const res = await axiosInstance.post(
-            `/messages/send/${selectedUser._id}`,
-            messageData,
+            `/messages/${conversationId}`,
+
+            data,
           );
-          set({ messages: [...messages, res.data], composerText: "" });
-          get().getConversations();
+
+          set((state) => ({
+            messages: [...state.messages, res.data],
+          }));
+
           return true;
         } catch (error) {
-          toast.error(
-            error.response?.data?.message || "Failed to send message",
-          );
+          toast.error("Failed to send message");
+
           return false;
         }
       },
 
-      subscribeToMessages: (userId) => {
-        if (!userId) return;
-
+      subscribeToMessages: (conversationId) => {
         const socket = useAuthStore.getState().socket;
+
         if (!socket) return;
 
+        socket.emit("joinConversation", conversationId);
+
         socket.off("newMessage");
-        socket.on("newMessage", (newMessage) => {
-          // if im not the receiver don't do anything just return
-          if (String(newMessage.senderId) !== String(userId)) return;
 
-          set({ messages: [...get().messages, newMessage] });
+        socket.on("newMessage", (message) => {
+          if (message.conversation_id !== conversationId) return;
 
-          get().getConversations();
+          set((state) => ({
+            messages: [...state.messages, message],
+          }));
         });
       },
 
-      unsubscribeFromMessages: () => {
+      unsubscribeFromMessages: (conversationId) => {
         const socket = useAuthStore.getState().socket;
-        socket?.off("newMessage");
+
+        if (!socket) return;
+
+        socket.emit("leaveConversation", conversationId);
+
+        socket.off("newMessage");
       },
 
       setSelectedUser: (selectedUser) => set({ selectedUser }),
@@ -131,10 +144,17 @@ export const useChatStore = create(
       setSoundEnabled: (isSoundEnabled) => set({ isSoundEnabled }),
 
       sendTextMessage: async (conversationId) => {
-        const messageText = get().composerText.trim();
-        if (!conversationId || !messageText) return false;
+        const text = get().composerText.trim();
 
-        return get().sendMessage({ text: messageText });
+        if (!conversationId || !text) return false;
+
+        return get().sendMessage({
+          conversationId,
+
+          data: {
+            text,
+          },
+        });
       },
 
       sendMediaMessage: async ({ conversationId, file }) => {
