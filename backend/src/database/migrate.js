@@ -1,8 +1,8 @@
 import "dotenv/config"; // load environment variables
 
 import { Client } from "pg"; // import Postgres client from pg library
-const fs = require("fs"); // import file system module (used to read migration files)
-const path = require("path"); // import path module (used to build safe file paths across OS)
+import fs from "fs"; // import file system module (used to read migration files)
+import path from "path"; // import path module (used to build safe file paths across OS)
 
 // Runs all pennding SQL migration files in the migrations directory
 // Ensures each migration runs only once by tracking htem in a database table
