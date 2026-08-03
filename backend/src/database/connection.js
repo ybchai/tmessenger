@@ -1,6 +1,6 @@
-const { Pool } = require("pg"); // import pool from pg
+import { Pool } from "pg"; // import pool from pg
 
-import "dotenv/config";; // import dotenv
+import "dotenv/config"; // import dotenv
 
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
@@ -24,4 +24,4 @@ const query = async (text, params) => {
   }
 };
 
-module.exports = { pool, query };
+export { pool, query };

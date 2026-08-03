@@ -1,6 +1,6 @@
 import "dotenv/config"; // load environment variables
 
-const { Client } = require("pg"); // import Postgres client from pg library
+import { Client } from "pg"; // import Postgres client from pg library
 const fs = require("fs"); // import file system module (used to read migration files)
 const path = require("path"); // import path module (used to build safe file paths across OS)
 
