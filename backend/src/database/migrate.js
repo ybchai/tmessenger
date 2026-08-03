@@ -1,8 +1,13 @@
-import "dotenv/config"; // load environment variables
+import "dotenv/config";
 
-import { Client } from "pg"; // import Postgres client from pg library
-import fs from "fs"; // import file system module (used to read migration files)
-import path from "path"; // import path module (used to build safe file paths across OS)
+import { Client } from "pg";
+import fs from "fs";
+import path from "path";
+import { fileURLToPath } from "url";
+
+const __filename = fileURLToPath(import.meta.url);
+
+const __dirname = path.dirname(__filename);
 
 // Runs all pennding SQL migration files in the migrations directory
 // Ensures each migration runs only once by tracking htem in a database table
@@ -60,8 +65,10 @@ async function runMigration() {
       await client.query("BEGIN");
       await client.query(migration);
       // Record the migration as executed in the migrations table
-      await client.query("INSERT INTO migrations (filename) VALUES ($1)", [file]);
-      await client.query("COMMIT")
+      await client.query("INSERT INTO migrations (filename) VALUES ($1)", [
+        file,
+      ]);
+      await client.query("COMMIT");
       console.log(`Migration ${file} executed successfully`);
     }
   } catch (error) {
@@ -75,4 +82,4 @@ async function runMigration() {
 }
 
 // run the migration
-export default runMigration
+export default runMigration;
