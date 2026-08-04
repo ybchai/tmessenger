@@ -11,24 +11,21 @@ import { SearchField, Tabs } from "@heroui/react";
 import { MessageSquareIcon, UsersIcon } from "lucide-react";
 import { ConversationRow } from "./ConversationRow";
 
+import { useEffect } from "react";
+
 function mapConversation(conversation) {
+  
   return {
     id: conversation.id,
-
-    name: conversation.u.full_name,
-
+    name: conversation.peer.full_name,
     avatarUrl: conversation.peer.profile_pic,
-
-    initials: getInitials(conversation.u.full_name),
+    initials: getInitials(conversation.peer.full_name),
 
     peer: {
       id: conversation.peer.id,
-
-      name: conversation.u.full_name,
-
+      name: conversation.peer.full_name,
       avatarUrl: conversation.peer.profile_pic,
-
-      initials: getInitials(conversation.u.full_name),
+      initials: getInitials(conversation.peer.full_name),
     },
   };
 }
@@ -36,20 +33,14 @@ function mapConversation(conversation) {
 function mapUserForList(user) {
   return {
     id: user.id,
-
     name: user.full_name,
-
     avatarUrl: user.profile_pic,
-
     initials: getInitials(user.full_name),
 
     peer: {
       id: user.id,
-
       name: user.full_name,
-
       avatarUrl: user.profile_pic,
-
       initials: getInitials(user.full_name),
     },
   };
@@ -59,6 +50,8 @@ function ChatSidebar() {
   const conversations = useChatStore((state) => state.conversations);
 
   const users = useChatStore((state) => state.users);
+
+  const searchUsers = useChatStore((state) => state.searchUsers);
 
   const createConversation = useChatStore((state) => state.createConversation);
 
@@ -93,6 +86,13 @@ function ChatSidebar() {
         user.name.toLowerCase().includes(normalizedSearchQuery),
       )
     : userList;
+
+  useEffect(() => {
+    if (sidebarTab !== "users") {
+      return;
+    }
+    searchUsers(searchQuery);
+  }, [searchQuery, sidebarTab, searchUsers]);
 
   return (
     <aside
@@ -191,7 +191,10 @@ function ChatSidebar() {
             variant="secondary"
             className="w-full"
             value={searchQuery}
-            onChange={setSearchQuery}
+            onChange={(value) => {
+              setSearchQuery(value);
+              searchUsers(value);
+            }}
           >
             <SearchField.Group
               className="

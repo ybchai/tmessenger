@@ -58,6 +58,34 @@ export async function searchUsers(search, currentUserId) {
   return result.rows;
 }
 
+export async function searchUsersByName(search, currentUserId) {
+  const result = await query(
+    `
+        SELECT
+            id,
+            full_name,
+            email,
+            profile_pic,
+            preferred_language
+
+        FROM users
+
+        WHERE deleted_at IS NULL
+
+        AND id != $2
+
+        AND full_name ILIKE $1 
+
+        ORDER BY full_name ASC
+
+        LIMIT 20
+        `,
+    [`%${search}%`, currentUserId],
+  );
+
+  return result.rows;
+}
+
 export async function upsertUser({ clerkId, email, fullName, profilePic }) {
   const result = await query(
     `

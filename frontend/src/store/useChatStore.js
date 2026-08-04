@@ -136,6 +136,27 @@ export const useChatStore = create((set, get) => ({
     socket.off("receive_message");
   },
 
+  // SEARCH
+  searchUsers: async (query) => {
+    if (!query.trim()) {
+      set({
+        users: [],
+      });
+
+      return;
+    }
+
+    try {
+      const res = await axiosInstance.get(`/users/search?q=${query}`);
+
+      set({
+        users: res.data,
+      });
+    } catch (error) {
+      console.log("Search users error", error.message);
+    }
+  },
+
   // SELECT
   setSelectedUser: (selectedUser) => {
     set({
@@ -200,7 +221,7 @@ export const useChatStore = create((set, get) => ({
     return success;
   },
 
-  // SEND MEDIA 
+  // SEND MEDIA
   sendMediaMessage: async ({ conversationId, file }) => {
     if (!conversationId || !file) {
       return false;
