@@ -10,10 +10,16 @@ export const app = express();
 
 export const server = http.createServer(app);
 
+const allowedOrigins = [
+  "http://localhost:5173",
+  process.env.FRONTEND_URL,
+  "https://tmessenger.onrender.com"
+];
+
+
 export const io = new Server(server, {
   cors: {
-    origin: process.env.FRONTEND_URL || "http://localhost:5173",
-
+    origin: allowedOrigins,
     credentials: true,
   },
 });

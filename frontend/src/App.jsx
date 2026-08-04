@@ -16,7 +16,7 @@ import { useEffect } from "react";
 import { Toaster } from "react-hot-toast";
 
 function App() {
-  const { isSignedIn, isLoaded, getToken } = useAuth();
+  const { isSignedIn, isLoaded } = useAuth();
 
   const clearAuth = useAuthStore((state) => state.clearAuth);
 
@@ -31,12 +31,17 @@ function App() {
       if (!isLoaded) return;
 
       if (isSignedIn) {
-
         // check Clerk session
         // check PostgreSQL user
-        // create socket
-        await checkAuth();
 
+        const user = await checkAuth();
+
+        // create socket
+        if (user) {
+          connectSocket(user);
+        }
+
+        console.log("AUTH USER:", user);
       } else {
         clearAuth();
       }

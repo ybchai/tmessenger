@@ -64,20 +64,19 @@ export const useAuthStore = create((set, get) => ({
 
       set({
         authUser: user,
-
         preferredLanguage: user.preferred_language || "en",
       });
 
-      // connect realtime
-      get().connectSocket(user);
+      return user;
     } catch (error) {
       console.error("Auth check failed:", error.message);
 
       set({
         authUser: null,
-
         preferredLanguage: "en",
       });
+
+      return null;
     } finally {
       set({
         isCheckingAuth: false,

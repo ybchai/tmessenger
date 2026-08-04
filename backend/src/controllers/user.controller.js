@@ -1,23 +1,20 @@
-import { searchUsersByName, updatePreferredLanguageById } from "../repositories/user.repository.js";
+import {
+  searchUsers,
+  updatePreferredLanguageById,
+} from "../repositories/user.repository.js";
 
-export async function searchUsers(req, res) {
+export async function getUsers(req, res) {
   try {
-    const { q } = req.query;
+    const { q = "" } = req.query;
 
-    if (!q || q.trim() === "") {
-      return res.status(400).json({
-        error: "Search query required",
-      });
-    }
-
-    const users = await searchUsersByName(q);
+    const users = await searchUsers(q, req.user.id);
 
     res.status(200).json(users);
   } catch (error) {
-    console.error("Search users error:", error);
+    console.error("Get users error:", error);
 
     res.status(500).json({
-      error: "Internal server error",
+      error: "Failed to fetch users",
     });
   }
 }
@@ -35,7 +32,7 @@ export async function updatePreferredLanguage(req, res) {
 
     const user = await updatePreferredLanguageById(userId, language);
 
-    if(!user) {
+    if (!user) {
       return res.status(404).json({
         error: "User not found",
       });
@@ -45,7 +42,6 @@ export async function updatePreferredLanguage(req, res) {
       success: true,
       user,
     });
-
   } catch (error) {
     console.error("Update preferred language error:", error);
 
