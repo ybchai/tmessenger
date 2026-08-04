@@ -26,27 +26,28 @@ function App() {
 
   const isCheckingAuth = useAuthStore((state) => state.isCheckingAuth);
 
-  const hasCheckedAuth = useRef(false);
+  const authInitialized = useRef(false);
+
+  const { getToken } = useAuth();
 
   useEffect(() => {
-    console.log("APP EFFECT RUN", {
-      isLoaded,
-      isSignedIn,
-      isCheckingAuth,
-    });
-
     async function authenticate() {
       if (!isLoaded) return;
 
-      if (hasCheckedAuth.current) return;
+      if (authInitialized.current) {
+        return;
+      }
 
-      hasCheckedAuth.current = true;
+      authInitialized.current = true;
+
+      console.log("APP EFFECT RUN");
 
       if (isSignedIn) {
         const user = await checkAuth();
 
         if (user) {
-          connectSocket(user);
+          const token = await getToken();
+          connectSocket(user, token);
         }
       } else {
         clearAuth();
