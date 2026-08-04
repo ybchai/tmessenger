@@ -18,11 +18,15 @@ export const useAuthStore = create((set, get) => ({
 
   // Connect socket after PostgreSQL user is loaded
   connectSocket: (user) => {
-    if (!user) return;
+
+    console.log("CONNECT SOCKET USER:", user);
+
+    if (!user || !user.id) {
+      console.error("Socket connection cancelled. Invalid user:", user);
+      return;
+    }
 
     if (get().socket?.connected) return;
-
-    console.log("Connecting socket user:", user);
 
     const socket = io(BASE_URL, {
       query: {
