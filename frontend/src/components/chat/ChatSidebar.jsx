@@ -14,6 +14,10 @@ import { ConversationRow } from "./ConversationRow";
 import { useEffect } from "react";
 
 function mapConversation(conversation) {
+  if (!conversation.peer) {
+    return null;
+  }
+
   return {
     id: conversation.id,
     name: conversation.peer.full_name,
@@ -70,7 +74,7 @@ function ChatSidebar() {
 
   const normalizedSearchQuery = searchQuery.trim().toLowerCase();
 
-  const conversationList = conversations.map(mapConversation);
+  const conversationList = conversations.map(mapConversation).filter(Boolean);
 
   const userList = users.map(mapUserForList);
 
