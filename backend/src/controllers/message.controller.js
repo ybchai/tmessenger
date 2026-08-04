@@ -70,6 +70,18 @@ export async function sendMessage(req, res) {
       videoUrl,
     });
 
+    const formattedMessage = {
+      id: message.id,
+      text: message.original_text,
+      imageUrl: message.image_url,
+      videoUrl: message.video_url,
+      time:  new Date(message.created_at).toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit",
+      }),
+      role: message.sender_id === senderId ? "me" : "other",
+    };
+
     console.log("Message created:", message.id);
 
     console.log("Updating conversation timestamp...");
