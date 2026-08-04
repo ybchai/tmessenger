@@ -20,40 +20,35 @@ export const useAuthStore = create((set, get) => ({
 
   // Connect socket after PostgreSQL user is loaded
   connectSocket: (user) => {
-    console.log("CONNECT SOCKET USER:", user);
+    const existingSocket = get().socket;
 
-    if (!user || !user.id) {
-      console.error("Socket connection cancelled. Invalid user:", user);
+    if (existingSocket) {
+      console.log("Socket already exists");
       return;
     }
 
-    if (get().socket?.connected) return;
+    if (!user?.id) {
+      console.error("Invalid user", user);
+      return;
+    }
 
     const socket = io(BASE_URL, {
       query: {
         userId: user.id,
       },
-
       withCredentials: true,
-
       transports: ["polling"],
     });
 
-    set({
-      socket,
+    socket.on("connect", () => {
+      console.log("Socket connected:", socket.id);
     });
-  },
 
-  disconnectSocket: () => {
-    const socket = get().socket;
-
-    if (socket) {
-      socket.disconnect();
-    }
-
-    set({
-      socket: null,
+    socket.on("disconnect", () => {
+      console.log("Socket disconnected");
     });
+
+    set({ socket });
   },
 
   checkAuth: async () => {
@@ -114,13 +109,29 @@ export const useAuthStore = create((set, get) => ({
     }
   },
 
+  disconnectSocket: () => {
+    const socket = get().socket;
+
+    if (socket) {
+      socket.disconnect();
+    }
+
+    set({
+      socket: null,
+    });
+  },
+
   clearAuth: () => {
+    const socket = get().socket;
+
+    if (socket) {
+      socket.disconnect();
+    }
+
     set({
       authUser: null,
-
       preferredLanguage: "en",
+      socket: null,
     });
-
-    get().disconnectSocket();
   },
 }));

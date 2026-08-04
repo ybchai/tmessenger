@@ -26,9 +26,18 @@ function App() {
 
   const isCheckingAuth = useAuthStore((state) => state.isCheckingAuth);
 
+  const hasCheckedAuth = useRef(false);
+
   useEffect(() => {
+
+    console.log("APP EFFECT RUN");
+
+    if (hasCheckedAuth.current) return;
+
     async function authenticate() {
       if (!isLoaded) return;
+
+      hasCheckedAuth.current = true;
 
       if (isSignedIn) {
         const user = await checkAuth();
@@ -42,7 +51,7 @@ function App() {
     }
 
     authenticate();
-  }, [isLoaded, isSignedIn]);
+  }, [isLoaded, isSignedIn, checkAuth, connectSocket, clearAuth]);
 
   if (!isLoaded || (isSignedIn && isCheckingAuth)) {
     return <PageLoader />;
