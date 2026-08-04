@@ -5,18 +5,6 @@ import {
   getConversationParticipants,
 } from "../repositories/conversation.repository.js";
 
-/*
-    Create or get existing DM conversation
-
-    POST /api/conversations
-
-    Body:
-    {
-        userId:"01USER..."
-    }
-
-*/
-
 export async function createOrGetConversation(req, res) {
   try {
     const currentUserId = req.user.id;
@@ -66,12 +54,8 @@ export async function createOrGetConversation(req, res) {
   }
 }
 
-/*
-    Get sidebar conversations
-
-    GET /api/conversations
-
-*/
+//Get sidebar conversations
+//GET /api/conversations
 
 export async function getConversations(req, res) {
   try {
@@ -89,12 +73,8 @@ export async function getConversations(req, res) {
   }
 }
 
-/*
-    Get conversation members
-
-    GET /api/conversations/:id/participants
-
-*/
+//Get conversation members
+//GET /api/conversations/:id/participants
 
 export async function getParticipants(req, res) {
   try {

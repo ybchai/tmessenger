@@ -1,7 +1,13 @@
 import {
   getMessagesByConversation,
   createMessage,
+  getReceiverLanguage,
+  updateConversationTimestamp,
 } from "../repositories/message.repository.js";
+
+import { createTranslation } from "../repositories/translation.repository.js";
+
+import { translateText } from "../services/translation.service.js";
 
 import { hasImageKitConfig, uploadChatMedia } from "../lib/imagekit.js";
 
@@ -30,7 +36,6 @@ export async function sendMessage(req, res) {
     const { text } = req.body;
 
     let imageUrl = null;
-
     let videoUrl = null;
 
     if (req.file) {
@@ -51,19 +56,36 @@ export async function sendMessage(req, res) {
 
     const message = await createMessage({
       conversationId,
-
       senderId,
-
-      text,
-
+      originalText: text,
       imageUrl,
-
       videoUrl,
     });
 
+    // Update sidebar ordering
+    await updateConversationTimestamp(conversationId);
+
+    // Translation
+    if (text) {
+      const targetLanguage = await getReceiverLanguage(
+        conversationId,
+        senderId,
+      );
+
+      if (targetLanguage) {
+        const translation = await translateText(text, targetLanguage);
+
+        await createTranslation({
+          messageId: message.id,
+          languageCode: targetLanguage,
+          translatedText: translation.translatedText,
+        });
+      }
+    }
+
     res.status(201).json(message);
   } catch (error) {
-    console.error("Send message error:", error.message);
+    console.error("Send message error:", error);
 
     res.status(500).json({
       error: "Internal server error",

@@ -12,26 +12,36 @@ export const useAuthStore = create((set, get) => ({
 
   socket: null,
 
-  // connect socket after PostgreSQL user is loaded
-  connectSocket: (user) => {
-    if (!user) return;
+  connectSocket: (token) => {
+    if (!token) {
+      console.error("No Clerk token provided");
+      return;
+    }
 
-    // prevent duplicate connections
-    if (get().socket?.connected) return;
+    if (get().socket?.connected) {
+      return;
+    }
 
     const socket = io(BASE_URL, {
-      query: {
-        userId: user.id,
-      },
-
       withCredentials: true,
+
+      auth: {
+        token,
+      },
     });
 
     set({
       socket,
     });
-  },
 
+    socket.on("connect", () => {
+      console.log("Socket connected:", socket.id);
+    });
+
+    socket.on("connect_error", (error) => {
+      console.error("Socket error:", error.message);
+    });
+  },
   disconnectSocket: () => {
     const socket = get().socket;
 
@@ -58,8 +68,9 @@ export const useAuthStore = create((set, get) => ({
         authUser: user,
       });
 
-      // connect realtime after auth success
-      get().connectSocket(user);
+      // connect socket after login
+
+      get().connectSocket();
     } catch (error) {
       console.error("Auth check failed:", error.message);
 

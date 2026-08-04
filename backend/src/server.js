@@ -16,7 +16,7 @@ import authRoutes from "./routes/auth.route.js";
 import messageRoutes from "./routes/message.route.js";
 import conversationRoutes from "./routes/conversation.route.js";
 import userRoutes from "./routes/user.route.js";
-import { app, server } from "./lib/socket.js";
+import { app, server } from "./sockets/socket.js";
 
 const PORT = process.env.PORT;
 const FRONTEND_URL = process.env.FRONTEND_URL;
@@ -32,7 +32,7 @@ app.use(
   express.raw({ type: "application/json" }),
   clerkWebhook,
 );
-// normal JSON parser 
+// normal JSON parser
 app.use(express.json());
 // Clerk middleware
 app.use(clerkMiddleware());

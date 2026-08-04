@@ -67,17 +67,34 @@ export async function createMessage({
 
     RETURNING *
     `,
-    [
-      messageId,
-      conversationId,
-      senderId,
-      originalText,
-      imageUrl,
-      videoUrl,
-    ]
+    [messageId, conversationId, senderId, originalText, imageUrl, videoUrl],
   );
 
   return result.rows[0];
+}
+
+export async function getReceiverLanguage(conversationId, senderId) {
+  const result = await query(
+    `
+    SELECT
+    u.preferred_language
+
+    FROM conversation_participants cp
+
+    JOIN users u
+    ON u.id = cp.user_id
+
+    WHERE cp.conversation_id=$1
+
+    AND cp.user_id != $2
+
+    LIMIT 1
+
+    `,
+    [conversationId, senderId],
+  );
+
+  return result.rows[0]?.preferred_language;
 }
 
 export async function updateConversationTimestamp(conversationId) {

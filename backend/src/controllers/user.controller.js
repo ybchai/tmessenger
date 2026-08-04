@@ -4,14 +4,20 @@ export async function getUsers(req, res) {
   try {
     const { q } = req.query;
 
-    const users = await searchUsers(q, req.user.id);
+    if (!q || q.trim() === "") {
+      return res.status(400).json({
+        message: "Search query is required",
+      });
+    }
 
-    res.json(users);
+    const users = await searchUsers(q, req.auth.userId);
+
+    res.status(200).json(users);
   } catch (error) {
-    console.error(error);
+    console.error("Search users error:", error);
 
     res.status(500).json({
-      message: "Failed to fetch users",
+      message: "Server error",
     });
   }
 }
