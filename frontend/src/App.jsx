@@ -11,7 +11,7 @@ import AuthPage from "./pages/AuthPage";
 
 import PageLoader from "./components/PageLoader";
 
-import { useEffect, useRef } from "react";
+import { useEffect } from "react";
 
 import { Toaster } from "react-hot-toast";
 
@@ -20,20 +20,18 @@ function App() {
 
   const { isSignedIn, isLoaded, getToken } = useAuth();
 
-  const clearAuth = useAuthStore((state) => state.clearAuth);
-  const checkAuth = useAuthStore((state) => state.checkAuth);
-  const connectSocket = useAuthStore((state) => state.connectSocket);
-  const setAuthUser = useAuthStore((state) => state.setAuthUser);
-
   const isCheckingAuth = useAuthStore((state) => state.isCheckingAuth);
-
-  const authInitialized = useRef(false);
 
   useEffect(() => {
     async function authenticate() {
       if (!isLoaded) return;
 
       console.log("APP EFFECT RUN");
+
+      const checkAuth = useAuthStore.getState().checkAuth;
+      const clearAuth = useAuthStore.getState().clearAuth;
+      const connectSocket = useAuthStore.getState().connectSocket;
+      const setAuthUser = useAuthStore.getState().setAuthUser;
 
       if (isSignedIn) {
         const user = await checkAuth();

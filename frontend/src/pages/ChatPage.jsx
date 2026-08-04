@@ -12,28 +12,25 @@ import { ChatComposer } from "../components/chat/ChatComposer";
 function ChatPage() {
   const { frameStyle } = useWallpaper();
 
-  const getUsers = useChatStore((state) => state.getUsers);
-  const getConversations = useChatStore((state) => state.getConversations);
-  const getMessages = useChatStore((state) => state.getMessages);
-
-  const subscribeToMessages = useChatStore(
-    (state) => state.subscribeToMessages,
-  );
-  const unsubscribeFromMessages = useChatStore(
-    (state) => state.unsubscribeFromMessages,
-  );
-
   const { activeConversationId, isLargeScreen } = useSelectedConversation();
 
   // Initial sidebar loading
   useEffect(() => {
+    const getUsers = useChatStore.getState().getUsers;
+    const getConversations = useChatStore.getState().getConversations;
+
     getUsers();
     getConversations();
-  }, [getUsers, getConversations]);
+  }, []);
 
   // Load messages + socket room
   useEffect(() => {
     if (!activeConversationId) return;
+
+    const getMessages = useChatStore.getState().getMessages;
+    const subscribeToMessages = useChatStore.getState().subscribeToMessages;
+    const unsubscribeFromMessages =
+      useChatStore.getState().unsubscribeFromMessages;
 
     getMessages(activeConversationId);
 
