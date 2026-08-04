@@ -29,7 +29,7 @@ function ChatPage() {
   useEffect(() => {
     getUsers();
     getConversations();
-  }, []);
+  }, [getUsers, getConversations]);
 
   // Load messages + socket room
   useEffect(() => {
@@ -42,7 +42,7 @@ function ChatPage() {
     return () => {
       unsubscribeFromMessages(activeConversationId);
     };
-  }, [activeConversationId, getMessages, subscribeToMessages, unsubscribeFromMessages]);
+  }, [activeConversationId]);
 
   return (
     <div

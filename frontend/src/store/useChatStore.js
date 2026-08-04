@@ -90,25 +90,11 @@ export const useChatStore = create((set, get) => ({
 
   // MESSAGES
   getMessages: async (conversationId) => {
-    if (!conversationId) return;
+    const res = await axiosInstance.get(`/messages/${conversationId}`);
 
     set({
-      isMessagesLoading: true,
+      messages: res.data,
     });
-
-    try {
-      const res = await axiosInstance.get(`/messages/${conversationId}`);
-
-      set({
-        messages: res.data,
-      });
-    } catch (error) {
-      toast.error("Failed to load messages");
-    } finally {
-      set({
-        isMessagesLoading: false,
-      });
-    }
   },
 
   // SEND MESSAGE
@@ -132,33 +118,11 @@ export const useChatStore = create((set, get) => ({
 
   // SOCKET LISTENER
   subscribeToMessages: (conversationId) => {
-    const socket = useAuthStore.getState().socket;
-
-    if (!socket) return;
-
     socket.emit("join_conversation", conversationId);
-
-    socket.off("receive_message");
-
-    socket.on("receive_message", (message) => {
-      if (message.conversation_id !== conversationId) {
-        return;
-      }
-
-      set((state) => ({
-        messages: [...state.messages, message],
-      }));
-    });
   },
 
   unsubscribeFromMessages: (conversationId) => {
-    const socket = useAuthStore.getState().socket;
-
-    if (!socket) return;
-
     socket.emit("leave_conversation", conversationId);
-
-    socket.off("receive_message");
   },
 
   // SEARCH

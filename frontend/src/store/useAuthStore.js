@@ -21,7 +21,6 @@ export const useAuthStore = create((set, get) => ({
   // Connect socket after PostgreSQL user is loaded
   connectSocket: (user, token) => {
     const existingSocket = get().socket;
-    
 
     if (existingSocket) {
       console.log("Socket already exists");
@@ -60,6 +59,20 @@ export const useAuthStore = create((set, get) => ({
     try {
       const res = await axiosInstance.get("/auth/check");
 
+      const user = res.data;
+
+      console.log("CHECK AUTH");
+
+      return user;
+    } catch (error) {
+      return null;
+    }
+  },
+  /*
+  checkAuth: async () => {
+    try {
+      const res = await axiosInstance.get("/auth/check");
+
       console.log("BEFORE AUTH SET");
       const user = res.data;
       console.log("SETTING AUTH USER", user);
@@ -84,7 +97,7 @@ export const useAuthStore = create((set, get) => ({
       return null;
     }
   },
-
+*/
   updatePreferredLanguage: async (language) => {
     try {
       set((state) => ({
