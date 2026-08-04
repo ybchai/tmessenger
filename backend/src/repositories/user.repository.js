@@ -26,6 +26,35 @@ export async function findUserByClerkId(clerkId) {
 
   return result.rows[0];
 }
+
+export async function searchUsers(queryText, currentUserId) {
+  const result = await query(
+    `
+    SELECT
+        id,
+        full_name,
+        profile_pic,
+        preferred_language
+
+    FROM users
+
+    WHERE deleted_at IS NULL
+
+    AND id != $2
+
+    AND (
+        full_name ILIKE $1
+        OR email ILIKE $1
+    )
+
+    LIMIT 20
+    `,
+    [`%${queryText}%`, currentUserId],
+  );
+
+  return result.rows;
+}
+
 export async function upsertUser({ clerkId, email, fullName, profilePic }) {
   const result = await query(
     `
@@ -47,19 +76,14 @@ export async function upsertUser({ clerkId, email, fullName, profilePic }) {
             $5
         )
 
-
         ON CONFLICT(clerk_id)
 
         DO UPDATE SET
 
             email = EXCLUDED.email,
-
             full_name = EXCLUDED.full_name,
-
             profile_pic = EXCLUDED.profile_pic,
-
             updated_at = NOW()
-
 
         RETURNING *
         `,
@@ -76,7 +100,6 @@ export async function deactivateUserByClerkId(clerkId) {
         UPDATE users
 
         SET deleted_at = NOW(),
-
             updated_at = NOW()
 
         WHERE clerk_id = $1
