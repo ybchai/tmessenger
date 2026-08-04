@@ -1,5 +1,7 @@
 import { create } from "zustand";
+
 import { axiosInstance } from "../lib/axios";
+
 import { io } from "socket.io-client";
 
 const BASE_URL =
@@ -8,21 +10,26 @@ const BASE_URL =
 export const useAuthStore = create((set, get) => ({
   authUser: null,
 
+  preferredLanguage: "en",
+
   isCheckingAuth: true,
 
   socket: null,
 
+  // Connect socket after PostgreSQL user is loaded
   connectSocket: (user) => {
     if (!user) return;
 
     if (get().socket?.connected) return;
 
-    const socket = io(BASE_URL, {
-      withCredentials: true,
+    console.log("Connecting socket user:", user);
 
+    const socket = io(BASE_URL, {
       query: {
         userId: user.id,
       },
+
+      withCredentials: true,
     });
 
     set({
@@ -54,14 +61,19 @@ export const useAuthStore = create((set, get) => ({
 
       set({
         authUser: user,
+
+        preferredLanguage: user.preferred_language || "en",
       });
 
+      // connect realtime
       get().connectSocket(user);
     } catch (error) {
       console.error("Auth check failed:", error.message);
 
       set({
         authUser: null,
+
+        preferredLanguage: "en",
       });
     } finally {
       set({
@@ -72,31 +84,41 @@ export const useAuthStore = create((set, get) => ({
 
   updatePreferredLanguage: async (language) => {
     try {
-      const res = await axiosInstance.put(
-        "/users/language",
+      await axiosInstance.patch(
+        "/users/preferences",
 
         {
-          language,
+          preferredLanguage: language,
         },
       );
 
-      set({
+      set((state) => ({
+        preferredLanguage: language,
+
         authUser: {
-          ...get().authUser,
+          ...state.authUser,
 
-          preferred_language: res.data.preferred_language,
+          preferred_language: language,
         },
-      });
-    } catch (error) {
-      console.error("Update language failed:", error.message);
+      }));
 
-      throw error;
+      return true;
+    } catch (error) {
+      console.error(
+        "Update preferred language failed:",
+
+        error.message,
+      );
+
+      return false;
     }
   },
 
   clearAuth: () => {
     set({
       authUser: null,
+
+      preferredLanguage: "en",
     });
 
     get().disconnectSocket();
