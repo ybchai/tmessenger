@@ -49,14 +49,13 @@ export const useChatStore = create((set, get) => ({
         userId,
       });
 
-      const { conversationId } = res.data;
+      const conversationId = res.data.conversationId;
+
+      await get().getConversations();
 
       set({
         activeConversationId: conversationId,
       });
-
-      // refresh sidebar
-      await get().getConversations();
 
       return conversationId;
     } catch (error) {
@@ -64,8 +63,6 @@ export const useChatStore = create((set, get) => ({
         "Create conversation failed:",
         error.response?.data || error.message,
       );
-
-      toast.error("Failed to create conversation");
 
       return null;
     }
@@ -193,16 +190,10 @@ export const useChatStore = create((set, get) => ({
   },
 
   setActiveConversationId: (conversationId) => {
-    set((state) => ({
+    set({
       activeConversationId: conversationId,
-
-      selectedConversation:
-        state.conversations.find(
-          (conversation) => conversation.conversation_id === conversationId,
-        ) || null,
-
       messages: [],
-    }));
+    });
   },
 
   // UI

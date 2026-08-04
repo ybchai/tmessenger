@@ -29,7 +29,7 @@ function ChatPage() {
   useEffect(() => {
     getUsers();
     getConversations();
-  }, [getUsers, getConversations]);
+  }, []);
 
   // Load messages + socket room
   useEffect(() => {
