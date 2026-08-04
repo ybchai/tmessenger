@@ -20,8 +20,6 @@ const io = new Server(server, {
     origin: allowedOrigins,
     credentials: true,
   },
-
-  transports: ["websocket", "polling"],
 });
 
 io.use(socketAuth);
@@ -36,12 +34,6 @@ io.on("connection", (socket) => {
   socket.on("disconnect", () => {
     console.log("Socket disconnected:", socket.user.id);
   });
-});
-
-io.engine.on("connection_error", (err) => {
-  console.log("SOCKET ERROR");
-  console.log(err.message);
-  console.log(err.context);
 });
 
 export { app, server, io };

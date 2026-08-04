@@ -5,7 +5,9 @@ import { axiosInstance } from "../lib/axios";
 import { io } from "socket.io-client";
 
 const BASE_URL =
-  import.meta.env.MODE === "development" ? "http://localhost:3000" : "/";
+  import.meta.env.MODE === "development"
+    ? "http://localhost:3000"
+    : window.location.origin;
 
 export const useAuthStore = create((set, get) => ({
   authUser: null,
@@ -33,6 +35,8 @@ export const useAuthStore = create((set, get) => ({
       },
 
       withCredentials: true,
+
+      transports: ["polling", "websocket"],
     });
 
     set({
