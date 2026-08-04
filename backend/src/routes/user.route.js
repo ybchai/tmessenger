@@ -6,4 +6,6 @@ const router = express.Router();
 
 router.get("/search", protectRoute, searchUsers);
 
+router.patch("/preferences", protectRoute, updatePreferredLanguage);
+
 export default router;

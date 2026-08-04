@@ -14,7 +14,6 @@ import { ConversationRow } from "./ConversationRow";
 import { useEffect } from "react";
 
 function mapConversation(conversation) {
-  
   return {
     id: conversation.id,
     name: conversation.peer.full_name,
@@ -91,9 +90,14 @@ function ChatSidebar() {
     if (sidebarTab !== "users") {
       return;
     }
+
+    if (!searchQuery.trim()) {
+      return;
+    }
+
     searchUsers(searchQuery);
   }, [searchQuery, sidebarTab, searchUsers]);
-
+  
   return (
     <aside
       className={`

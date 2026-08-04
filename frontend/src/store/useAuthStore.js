@@ -18,7 +18,6 @@ export const useAuthStore = create((set, get) => ({
 
   // Connect socket after PostgreSQL user is loaded
   connectSocket: (user) => {
-
     console.log("CONNECT SOCKET USER:", user);
 
     if (!user || !user.id) {
@@ -88,30 +87,24 @@ export const useAuthStore = create((set, get) => ({
 
   updatePreferredLanguage: async (language) => {
     try {
-      await axiosInstance.patch(
-        "/users/preferences",
-
-        {
-          preferredLanguage: language,
-        },
-      );
-
       set((state) => ({
         preferredLanguage: language,
 
         authUser: {
           ...state.authUser,
-
           preferred_language: language,
         },
       }));
+
+      await axiosInstance.patch("/users/preferences", {
+        preferredLanguage: language,
+      });
 
       return true;
     } catch (error) {
       console.error(
         "Update preferred language failed:",
-
-        error.message,
+        error.response?.data || error.message,
       );
 
       return false;

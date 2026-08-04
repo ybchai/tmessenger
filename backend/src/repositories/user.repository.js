@@ -125,6 +125,25 @@ export async function upsertUser({ clerkId, email, fullName, profilePic }) {
   return result.rows[0];
 }
 
+export async function updatePreferredLanguageById(userId, language) {
+  const result = await query(
+    `
+        UPDATE users
+
+        SET preferred_language = $2,
+            updated_at = NOW()
+
+        WHERE id = $1
+
+        RETURNING id, preferred_language
+        `,
+
+    [userId, language],
+  );
+
+  return result.rows[0] || null;
+}
+
 export async function deactivateUserByClerkId(clerkId) {
   const result = await query(
     `
