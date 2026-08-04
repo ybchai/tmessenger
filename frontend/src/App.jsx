@@ -11,7 +11,7 @@ import AuthPage from "./pages/AuthPage";
 
 import PageLoader from "./components/PageLoader";
 
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 
 import { Toaster } from "react-hot-toast";
 
