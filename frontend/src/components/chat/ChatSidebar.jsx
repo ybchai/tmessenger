@@ -15,20 +15,20 @@ function mapConversation(conversation) {
   return {
     id: conversation.id,
 
-    name: conversation.peer.full_name,
+    name: conversation.u.full_name,
 
     avatarUrl: conversation.peer.profile_pic,
 
-    initials: getInitials(conversation.peer.full_name),
+    initials: getInitials(conversation.u.full_name),
 
     peer: {
       id: conversation.peer.id,
 
-      name: conversation.peer.full_name,
+      name: conversation.u.full_name,
 
       avatarUrl: conversation.peer.profile_pic,
 
-      initials: getInitials(conversation.peer.full_name),
+      initials: getInitials(conversation.u.full_name),
     },
   };
 }

@@ -12,36 +12,24 @@ export const useAuthStore = create((set, get) => ({
 
   socket: null,
 
-  connectSocket: (token) => {
-    if (!token) {
-      console.error("No Clerk token provided");
-      return;
-    }
+  connectSocket: (user) => {
+    if (!user) return;
 
-    if (get().socket?.connected) {
-      return;
-    }
+    if (get().socket?.connected) return;
 
     const socket = io(BASE_URL, {
       withCredentials: true,
 
-      auth: {
-        token,
+      query: {
+        userId: user.id,
       },
     });
 
     set({
       socket,
     });
-
-    socket.on("connect", () => {
-      console.log("Socket connected:", socket.id);
-    });
-
-    socket.on("connect_error", (error) => {
-      console.error("Socket error:", error.message);
-    });
   },
+
   disconnectSocket: () => {
     const socket = get().socket;
 
@@ -68,9 +56,7 @@ export const useAuthStore = create((set, get) => ({
         authUser: user,
       });
 
-      // connect socket after login
-
-      get().connectSocket();
+      get().connectSocket(user);
     } catch (error) {
       console.error("Auth check failed:", error.message);
 
@@ -81,6 +67,30 @@ export const useAuthStore = create((set, get) => ({
       set({
         isCheckingAuth: false,
       });
+    }
+  },
+
+  updatePreferredLanguage: async (language) => {
+    try {
+      const res = await axiosInstance.put(
+        "/users/language",
+
+        {
+          language,
+        },
+      );
+
+      set({
+        authUser: {
+          ...get().authUser,
+
+          preferred_language: res.data.preferred_language,
+        },
+      });
+    } catch (error) {
+      console.error("Update language failed:", error.message);
+
+      throw error;
     }
   },
 

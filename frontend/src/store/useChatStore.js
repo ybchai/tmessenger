@@ -200,6 +200,7 @@ export const useChatStore = create((set, get) => ({
     return success;
   },
 
+  // SEND MEDIA 
   sendMediaMessage: async ({ conversationId, file }) => {
     if (!conversationId || !file) {
       return false;
