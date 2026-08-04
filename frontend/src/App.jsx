@@ -11,7 +11,7 @@ import AuthPage from "./pages/AuthPage";
 
 import PageLoader from "./components/PageLoader";
 
-import { useEffect, useRef } from "react";
+import { useEffect } from "react";
 
 import { Toaster } from "react-hot-toast";
 
@@ -20,39 +20,28 @@ function App() {
 
   const { isSignedIn, isLoaded, getToken } = useAuth();
 
-  const clearAuth = useAuthStore((state) => state.clearAuth);
-
-  const checkAuth = useAuthStore((state) => state.checkAuth);
-
-  const connectSocket = useAuthStore((state) => state.connectSocket);
-
   const isCheckingAuth = useAuthStore((state) => state.isCheckingAuth);
 
-  // Use refs to stabilize function references
-  const checkAuthRef = useRef(checkAuth);
-  const clearAuthRef = useRef(clearAuth);
-  const connectSocketRef = useRef(connectSocket);
-
-  checkAuthRef.current = checkAuth;
-  clearAuthRef.current = clearAuth;
-  connectSocketRef.current = connectSocket;
-
   useEffect(() => {
-    async function authenticate() {
-      if (!isLoaded) return;
+    if (!isLoaded) return;
 
-      console.log("APP EFFECT RUN");
+    console.log("APP EFFECT RUN");
+
+    async function authenticate() {
+      const checkAuth = useAuthStore.getState().checkAuth;
+      const clearAuth = useAuthStore.getState().clearAuth;
+      const connectSocket = useAuthStore.getState().connectSocket;
 
       if (isSignedIn) {
-        const user = await checkAuthRef.current();
+        const user = await checkAuth();
 
         if (user) {
           const token = await getToken();
 
-          connectSocketRef.current(user, token);
+          connectSocket(user, token);
         }
       } else {
-        clearAuthRef.current();
+        clearAuth();
       }
     }
 
