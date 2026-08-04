@@ -118,10 +118,16 @@ export const useChatStore = create((set, get) => ({
 
   // SOCKET LISTENER
   subscribeToMessages: (conversationId) => {
+    const socket = useAuthStore.getState().socket;
+    if (!socket) return;
+
     socket.emit("join_conversation", conversationId);
   },
 
   unsubscribeFromMessages: (conversationId) => {
+    const socket = useAuthStore.getState().socket;
+    if (!socket) return;
+
     socket.emit("leave_conversation", conversationId);
   },
 

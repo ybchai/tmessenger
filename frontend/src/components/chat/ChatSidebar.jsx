@@ -336,7 +336,7 @@ function ChatSidebar() {
                   const conversationId = await createConversation(user.id);
 
                   if (conversationId) {
-                    setActiveConversationId(conversation.id);
+                    setActiveConversationId(conversationId);
                   }
                 }}
               />
