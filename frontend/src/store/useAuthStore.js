@@ -11,12 +11,10 @@ const BASE_URL =
 
 export const useAuthStore = create((set, get) => ({
   authUser: null,
-
   preferredLanguage: "en",
-
   isCheckingAuth: true,
-
   socket: null,
+  onlineUsers: [],
 
   // Connect socket after PostgreSQL user is loaded
   connectSocket: (user, token) => {

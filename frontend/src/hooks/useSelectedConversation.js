@@ -1,6 +1,7 @@
 import { useMediaQuery } from "./useMediaQuery";
 import { formatMessageTime } from "../lib/utils";
 
+import { useMemo } from "react";
 import { useChatStore } from "../store/useChatStore";
 import { useAuthStore } from "../store/useAuthStore";
 
@@ -24,7 +25,7 @@ export function useSelectedConversation() {
 
   const authUser = useAuthStore((state) => state.authUser);
 
-  const onlineUsers = useAuthStore((state) => state.onlineUsers || []);
+  const onlineUsers = useAuthStore((state) => state.onlineUsers);
 
   const isLargeScreen = useMediaQuery("(min-width:1024px)");
 
