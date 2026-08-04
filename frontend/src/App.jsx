@@ -16,6 +16,8 @@ import { useEffect, useRef } from "react";
 import { Toaster } from "react-hot-toast";
 
 function App() {
+  console.log("APP RENDER");
+
   const { isSignedIn, isLoaded } = useAuth();
 
   const clearAuth = useAuthStore((state) => state.clearAuth);
@@ -57,7 +59,7 @@ function App() {
     authenticate();
   }, [isLoaded, isSignedIn]);
 
-  if (!isLoaded) {
+  if (!isLoaded || (isSignedIn && isCheckingAuth)) {
     return <PageLoader />;
   }
 
