@@ -35,7 +35,7 @@ function App() {
     if (hasCheckedAuth.current) return;
 
     async function authenticate() {
-      if (!isLoaded || isSIgnedIn === undefined) return;
+      if (!isLoaded || isSignedIn === undefined) return;
 
       hasCheckedAuth.current = true;
 
