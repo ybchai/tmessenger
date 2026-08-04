@@ -97,7 +97,7 @@ function ChatSidebar() {
 
     searchUsers(searchQuery);
   }, [searchQuery, sidebarTab, searchUsers]);
-  
+
   return (
     <aside
       className={`
@@ -328,8 +328,12 @@ function ChatSidebar() {
                 key={user.id}
                 user={user}
                 selected={false}
-                onSelect={() => {
-                  createConversation(user.id);
+                onSelect={async () => {
+                  const conversationId = await createConversation(user.id);
+
+                  if (conversationId) {
+                    setActiveConversationId(conversation.id);
+                  }
                 }}
               />
             ))

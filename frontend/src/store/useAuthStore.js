@@ -36,7 +36,7 @@ export const useAuthStore = create((set, get) => ({
 
       withCredentials: true,
 
-      transports: ["polling", "websocket"],
+      transports: ["polling"],
     });
 
     set({

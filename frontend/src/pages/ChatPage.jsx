@@ -13,26 +13,25 @@ function ChatPage() {
   const { frameStyle } = useWallpaper();
 
   const getUsers = useChatStore((state) => state.getUsers);
-
   const getConversations = useChatStore((state) => state.getConversations);
-
   const getMessages = useChatStore((state) => state.getMessages);
 
   const subscribeToMessages = useChatStore(
     (state) => state.subscribeToMessages,
   );
-
   const unsubscribeFromMessages = useChatStore(
     (state) => state.unsubscribeFromMessages,
   );
 
   const { activeConversationId, isLargeScreen } = useSelectedConversation();
 
+  // Initial sidebar loading
   useEffect(() => {
     getUsers();
     getConversations();
-  }, []);
+  }, [getUsers, getConversations]);
 
+  // Load messages + socket room
   useEffect(() => {
     if (!activeConversationId) return;
 
@@ -43,7 +42,7 @@ function ChatPage() {
     return () => {
       unsubscribeFromMessages(activeConversationId);
     };
-  }, [activeConversationId]);
+  }, [activeConversationId, getMessages, subscribeToMessages, unsubscribeFromMessages]);
 
   return (
     <div

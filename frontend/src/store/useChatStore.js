@@ -43,6 +43,34 @@ export const useChatStore = create((set, get) => ({
   },
 
   // CONVERSATIONS
+  createConversation: async (userId) => {
+    try {
+      const res = await axiosInstance.post("/conversations", {
+        userId,
+      });
+
+      const { conversationId } = res.data;
+
+      set({
+        activeConversationId: conversationId,
+      });
+
+      // refresh sidebar
+      await get().getConversations();
+
+      return conversationId;
+    } catch (error) {
+      console.error(
+        "Create conversation failed:",
+        error.response?.data || error.message,
+      );
+
+      toast.error("Failed to create conversation");
+
+      return null;
+    }
+  },
+
   getConversations: async () => {
     set({
       isConversationsLoading: true,
