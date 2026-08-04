@@ -55,14 +55,16 @@ export const useAuthStore = create((set, get) => ({
     try {
       const res = await axiosInstance.get("/auth/check");
 
+      console.log("BEFORE AUTH SET");
       const user = res.data;
-      console.log("CHECK AUTH START")
+      console.log("SETTING AUTH USER", user);
+      console.log("CHECK AUTH START");
       set({
         authUser: user,
         preferredLanguage: user.preferred_language || "en",
         isCheckingAuth: false,
       });
-      console.log("CHECK AUTH STATE")
+      console.log("CHECK AUTH STATE");
 
       return user;
     } catch (error) {
