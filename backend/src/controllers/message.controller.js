@@ -35,7 +35,11 @@ export async function sendMessage(req, res) {
 
     const { text } = req.body;
 
-    console.log("Send message request:", { conversationId, senderId, text });
+    console.log("Send message request:", {
+      conversationId,
+      senderId,
+      text,
+    });
 
     let imageUrl = null;
     let videoUrl = null;
@@ -57,6 +61,7 @@ export async function sendMessage(req, res) {
     }
 
     console.log("Creating message...");
+
     const message = await createMessage({
       conversationId,
       senderId,
@@ -67,30 +72,39 @@ export async function sendMessage(req, res) {
 
     console.log("Message created:", message.id);
 
-    // Update sidebar ordering
     console.log("Updating conversation timestamp...");
+
     await updateConversationTimestamp(conversationId);
 
-    // Translation
+    // Translation should not break message sending
     if (text) {
-      console.log("Getting receiver language...");
-      const targetLanguage = await getReceiverLanguage(
-        conversationId,
-        senderId,
-      );
+      try {
+        console.log("Getting receiver language...");
 
-      console.log("Receiver language:", targetLanguage);
+        const targetLanguage = await getReceiverLanguage(
+          conversationId,
+          senderId,
+        );
 
-      if (targetLanguage) {
-        console.log("Translating text...");
-        const translation = await translateText(text, targetLanguage);
+        console.log("Receiver language:", targetLanguage);
 
-        console.log("Translation created, saving to database...");
-        await createTranslation({
-          messageId: message.id,
-          languageCode: targetLanguage,
-          translatedText: translation.translatedText,
-        });
+        if (targetLanguage) {
+          console.log("Translating text...");
+
+          const translation = await translateText(text, targetLanguage);
+
+          console.log("Translation created, saving to database...");
+
+          await createTranslation({
+            messageId: message.id,
+            languageCode: targetLanguage,
+            translatedText: translation.translatedText,
+          });
+        }
+      } catch (translationError) {
+        console.error("Translation failed:", translationError.message);
+
+        // Do not fail the message request
       }
     }
 
