@@ -56,32 +56,30 @@ export const useAuthStore = create((set, get) => ({
   },
 
   checkAuth: async () => {
-    try {
-      const res = await axiosInstance.get("/auth/check");
+    const res = await axiosInstance.get("/auth/check");
 
-      console.log("BEFORE AUTH SET");
-      const user = res.data;
-      console.log("SETTING AUTH USER", user);
-      console.log("CHECK AUTH START");
-      set({
-        authUser: user,
-        preferredLanguage: user.preferred_language || "en",
-        isCheckingAuth: false,
-      });
-      console.log("CHECK AUTH STATE");
+    const user = res.data;
 
-      return user;
-    } catch (error) {
-      console.error("Auth check failed:", error.message);
+    const currentUser = useAuthStore.getState().authUser;
 
-      set({
-        authUser: null,
-        preferredLanguage: "en",
-        isCheckingAuth: false,
-      });
-
-      return null;
+    if (
+      currentUser?.id === user.id &&
+      currentUser?.updated_at === user.updated_at
+    ) {
+      return currentUser;
     }
+
+    set((state) => ({
+      ...state,
+      authUser: user,
+      isCheckingAuth: false,
+    }));
+
+    set({
+      preferredLanguage: user.preferred_language || "en",
+    });
+
+    return user;
   },
 
   updatePreferredLanguage: async (language) => {
