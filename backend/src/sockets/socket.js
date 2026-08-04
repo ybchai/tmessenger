@@ -6,22 +6,18 @@ import { socketAuth } from "./auth.socket.js";
 import { registerConversationSocket } from "./conversation.socket.js";
 import { registerMessageSocket } from "./message.socket.js";
 
-export const app = express();
+const app = express();
 
-export const server = http.createServer(app);
+const server = http.createServer(app);
 
-const allowedOrigins = [
-  "http://localhost:5173",
-  process.env.FRONTEND_URL,
-  "https://tmessenger.onrender.com"
-];
+const allowedOrigins = ["http://localhost:5173" || process.env.FRONTEND_URL];
 
-
-export const io = new Server(server, {
+const io = new Server(server, {
   cors: {
-    origin: allowedOrigins,
-    credentials: true,
+    origin: [allowedOrigins],
   },
+
+  transports: ["websocket", "polling"],
 });
 
 io.use(socketAuth);
@@ -37,3 +33,11 @@ io.on("connection", (socket) => {
     console.log("Socket disconnected:", socket.user.id);
   });
 });
+
+io.engine.on("connection_error", (err)=>{
+    console.log("SOCKET ERROR");
+    console.log(err.message);
+    console.log(err.context);
+});
+
+export { app, server, io };
