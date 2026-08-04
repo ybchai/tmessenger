@@ -35,6 +35,8 @@ export async function sendMessage(req, res) {
 
     const { text } = req.body;
 
+    console.log("Send message request:", { conversationId, senderId, text });
+
     let imageUrl = null;
     let videoUrl = null;
 
@@ -54,6 +56,7 @@ export async function sendMessage(req, res) {
       }
     }
 
+    console.log("Creating message...");
     const message = await createMessage({
       conversationId,
       senderId,
@@ -62,19 +65,27 @@ export async function sendMessage(req, res) {
       videoUrl,
     });
 
+    console.log("Message created:", message.id);
+
     // Update sidebar ordering
+    console.log("Updating conversation timestamp...");
     await updateConversationTimestamp(conversationId);
 
     // Translation
     if (text) {
+      console.log("Getting receiver language...");
       const targetLanguage = await getReceiverLanguage(
         conversationId,
         senderId,
       );
 
+      console.log("Receiver language:", targetLanguage);
+
       if (targetLanguage) {
+        console.log("Translating text...");
         const translation = await translateText(text, targetLanguage);
 
+        console.log("Translation created, saving to database...");
         await createTranslation({
           messageId: message.id,
           languageCode: targetLanguage,
@@ -85,10 +96,12 @@ export async function sendMessage(req, res) {
 
     res.status(201).json(message);
   } catch (error) {
-    console.error("Send message error:", error);
+    console.error("Send message error:", error.message);
+    console.error("Error stack:", error.stack);
 
     res.status(500).json({
       error: "Internal server error",
+      details: error.message,
     });
   }
 }
