@@ -30,12 +30,12 @@ function App() {
 
   useEffect(() => {
 
-    console.log("APP EFFECT RUN");
+    console.log("APP EFFECT RUN", {isLoaded, isSignedIn, isCheckingAuth});
 
     if (hasCheckedAuth.current) return;
 
     async function authenticate() {
-      if (!isLoaded) return;
+      if (!isLoaded || isSIgnedIn === undefined) return;
 
       hasCheckedAuth.current = true;
 
@@ -43,7 +43,8 @@ function App() {
         const user = await checkAuth();
 
         if (user) {
-          connectSocket(user);
+          console.log("User authenticated:", user);
+          //connectSocket(user);
         }
       } else {
         clearAuth();
@@ -51,7 +52,7 @@ function App() {
     }
 
     authenticate();
-  }, [isLoaded, isSignedIn, checkAuth, connectSocket, clearAuth]);
+  }, [isLoaded, isSignedIn]);
 
   if (!isLoaded || (isSignedIn && isCheckingAuth)) {
     return <PageLoader />;

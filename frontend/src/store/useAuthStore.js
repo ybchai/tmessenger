@@ -52,19 +52,17 @@ export const useAuthStore = create((set, get) => ({
   },
 
   checkAuth: async () => {
-    set({
-      isCheckingAuth: true,
-    });
-
     try {
       const res = await axiosInstance.get("/auth/check");
 
       const user = res.data;
-
+      console.log("CHECK AUTH START")
       set({
         authUser: user,
         preferredLanguage: user.preferred_language || "en",
+        isCheckingAuth: false,
       });
+      console.log("CHECK AUTH STATE")
 
       return user;
     } catch (error) {
@@ -73,13 +71,10 @@ export const useAuthStore = create((set, get) => ({
       set({
         authUser: null,
         preferredLanguage: "en",
+        isCheckingAuth: false,
       });
 
       return null;
-    } finally {
-      set({
-        isCheckingAuth: false,
-      });
     }
   },
 
