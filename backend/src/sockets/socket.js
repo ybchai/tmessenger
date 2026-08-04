@@ -1,33 +1,33 @@
+import express from "express";
+import http from "http";
 import { Server } from "socket.io";
 
-import { socketAuth } from "../sockets/auth.socket.js";
-import { registerConversationSocket } from "../sockets/conversation.socket.js";
-import { registerMessageSocket } from "../sockets/message.socket.js";
+import { socketAuth } from "./auth.socket.js";
+import { registerConversationSocket } from "./conversation.socket.js";
+import { registerMessageSocket } from "./message.socket.js";
 
-export function initSocket(server) {
-  const io = new Server(server, {
-    cors: {
-      origin: process.env.FRONTEND_URL,
-      credentials: true,
-    },
+export const app = express();
+
+export const server = http.createServer(app);
+
+export const io = new Server(server, {
+  cors: {
+    origin: process.env.FRONTEND_URL || "http://localhost:5173",
+
+    credentials: true,
+  },
+});
+
+io.use(socketAuth);
+
+io.on("connection", (socket) => {
+  console.log("Socket connected:", socket.user.id);
+
+  registerConversationSocket(io, socket);
+
+  registerMessageSocket(io, socket);
+
+  socket.on("disconnect", () => {
+    console.log("Socket disconnected:", socket.user.id);
   });
-
-  // Authenticate socket connection
-  io.use(socketAuth);
-
-  io.on("connection", (socket) => {
-    console.log("Socket connected:", socket.user.id);
-
-    // Conversation events
-    registerConversationSocket(io, socket);
-
-    // Message events
-    registerMessageSocket(io, socket);
-
-    socket.on("disconnect", () => {
-      console.log("Socket disconnected:", socket.user.id);
-    });
-  });
-
-  return io;
-}
+});
