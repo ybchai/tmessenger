@@ -31,24 +31,19 @@ function App() {
       if (!isLoaded) return;
 
       if (isSignedIn) {
-        // check PostgreSQL user
 
+        // check Clerk session
+        // check PostgreSQL user
+        // create socket
         await checkAuth();
 
-        // get Clerk JWT
-
-        const token = await getToken();
-
-        // connect socket
-
-        connectSocket(token);
       } else {
         clearAuth();
       }
     }
 
     authenticate();
-  }, [isLoaded, isSignedIn, checkAuth, clearAuth, getToken, connectSocket]);
+  }, [isLoaded, isSignedIn, checkAuth, clearAuth, connectSocket]);
 
   if (!isLoaded || (isSignedIn && isCheckingAuth)) {
     return <PageLoader />;
