@@ -14,7 +14,11 @@ export function MessageList() {
 
   const messages = useChatStore((state) => state.messages);
 
+  console.log("MESSAGE LIST RENDER", messages);
+
   const lastMessageId = messages.at(-1)?.id;
+
+  console.log("Latest Message", lastMessageId);
 
   const messagesScrollRef = useScrollToBottom(
     activeConversationId,
