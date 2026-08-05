@@ -124,28 +124,31 @@ export const useChatStore = create((set, get) => ({
   // MESSAGES
   getMessages: async (conversationId) => {
     try {
-      set({
-        isMessagesLoading: true,
-      });
-
-      console.log("Fetching messages for:", conversationId);
-
       const res = await axiosInstance.get(`/messages/${conversationId}`);
 
-      console.log("Messages received:", res.data);
+      const currentUser = useAuthStore.getState().user;
+
+      const mappedMessages = res.data.map((message) => ({
+        id: message.id,
+
+        role: message.sender_id === currentUser.id ? "me" : "other",
+
+        text: message.text,
+
+        time: new Date(message.created_at).toLocaleTimeString([], {
+          hour: "2-digit",
+          minute: "2-digit",
+        }),
+
+        imageUrl: message.image_url,
+        videoUrl: message.video_url,
+      }));
 
       set({
-        messages: res.data,
+        messages: mappedMessages,
       });
     } catch (error) {
-      console.error(
-        "Get messages error:",
-        error.response?.data || error.message,
-      );
-    } finally {
-      set({
-        isMessagesLoading: false,
-      });
+      console.error("Get messages error:", error);
     }
   },
 
@@ -177,10 +180,27 @@ export const useChatStore = create((set, get) => ({
         data,
       );
 
-      set((state) => ({
-        messages: [...state.messages, res.data],
+      const message = res.data;
 
-        activeConversationId: realConversationId,
+      const currentUser = useAuthStore.getState().user;
+
+      set((state) => ({
+        messages: [
+          ...state.messages,
+
+          {
+            id: message.id,
+
+            role: message.sender_id === currentUser.id ? "me" : "other",
+
+            text: message.text,
+
+            time: new Date(message.created_at).toLocaleTimeString([], {
+              hour: "2-digit",
+              minute: "2-digit",
+            }),
+          },
+        ],
       }));
 
       return true;
@@ -200,9 +220,18 @@ export const useChatStore = create((set, get) => ({
   // SOCKET LISTENER
   subscribeToMessages: (conversationId) => {
     const socket = useAuthStore.getState().socket;
+
     if (!socket) return;
 
     socket.emit("join_conversation", conversationId);
+
+    socket.off("receive_message");
+
+    socket.on("receive_message", (message) => {
+      set((state) => ({
+        messages: [...state.messages, message],
+      }));
+    });
   },
 
   unsubscribeFromMessages: (conversationId) => {
