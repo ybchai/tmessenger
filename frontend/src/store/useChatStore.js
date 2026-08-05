@@ -50,18 +50,24 @@ export const useChatStore = create((set, get) => ({
 
       const conversation = res.data;
 
+      console.log("created conversation:", conversation);
+
       set((state) => ({
         conversations: state.conversations.map((conv) => {
           if (conv.isTemporary && conv.other_user.id === userId) {
-            return conversation;
+            return {
+              ...conversation,
+
+              // keep sidebar compatible
+              peer: conv.other_user,
+
+              id: conversation.conversationId,
+              isTemporary: false,
+            };
           }
 
           return conv;
         }),
-
-        activeConversationId: conversation.conversationId,
-
-        selectedConversation: conversation,
       }));
 
       return conversation.conversationId;
@@ -107,12 +113,16 @@ export const useChatStore = create((set, get) => ({
   },
 
   getConversations: async () => {
+    console.log("GET CONVERSATIONS CALLED");
+
     set({
       isConversationsLoading: true,
     });
 
     try {
       const res = await axiosInstance.get("/conversations");
+
+      console.log("Backend conversations:", res.data);
 
       set({
         conversations: res.data,

@@ -80,7 +80,12 @@ function ChatSidebar() {
 
   const normalizedSearchQuery = searchQuery.trim().toLowerCase();
 
-  const conversationList = conversations.map(mapConversation).filter(Boolean);
+  const conversationList = conversations
+    .map((conversation) => {
+      console.log("Sidebar state:", conversation);
+      return mapConversation(conversation);
+    })
+    .filter(Boolean);
 
   const userList = users.map(mapUserForList);
 
