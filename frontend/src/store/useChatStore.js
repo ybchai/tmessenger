@@ -123,11 +123,23 @@ export const useChatStore = create((set, get) => ({
 
   // MESSAGES
   getMessages: async (conversationId) => {
-    const res = await axiosInstance.get(`/messages/${conversationId}`);
+    try {
+      set({
+        isMessagesLoading: true,
+      });
 
-    set({
-      messages: res.data,
-    });
+      const res = await axiosInstance.get(`/messages/${conversationId}`);
+
+      set({
+        messages: res.data,
+      });
+    } catch (error) {
+      console.error("Get messages error:", error.message);
+    } finally {
+      set({
+        isMessagesLoading: false,
+      });
+    }
   },
 
   // SEND MESSAGE
@@ -221,16 +233,21 @@ export const useChatStore = create((set, get) => ({
     });
   },
 
-  setActiveConversationId: (conversationId) => {
-    set((state) => ({
+  setActiveConversationId: async (conversationId) => {
+    const conversation = get().conversations.find(
+      (c) => c.conversation_id === conversationId,
+    );
+
+    set({
       activeConversationId: conversationId,
-
-      selectedConversation: state.conversations.find(
-        (conv) => conv.conversation_id === conversationId,
-      ),
-
       messages: [],
-    }));
+    });
+
+    if (conversation?.isTemporary) {
+      return;
+    }
+
+    await get().getMessages(conversationId);
   },
 
   // UI
