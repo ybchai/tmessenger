@@ -135,7 +135,7 @@ export const useChatStore = create((set, get) => ({
       const mappedMessages = res.data.map((message) => ({
         id: message.id,
 
-        role: message.sender?.id === currentUser?.id ? "me" : "other",
+        role: message.sender_id === currentUser?.id ? "me" : "other",
 
         text: message.text,
 
@@ -195,7 +195,7 @@ export const useChatStore = create((set, get) => ({
           {
             id: message.id,
 
-            role: message.sender?.id === currentUser?.id ? "me" : "other",
+            role: message.sender_id === currentUser?.id ? "me" : "other",
 
             text: message.text,
 
