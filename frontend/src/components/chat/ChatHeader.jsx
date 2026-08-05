@@ -79,7 +79,7 @@ export function ChatHeader() {
       )}
 
       <select
-        value={preferredLanguage || "en"}
+        value={preferredLanguage || "en-US"}
         onChange={(e) => updatePreferredLanguage(e.target.value)}
         aria-label="Select preferred language"
         className="

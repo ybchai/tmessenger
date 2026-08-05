@@ -10,7 +10,7 @@ export default function LanguageSelector() {
 
   return (
     <select
-      value={authUser?.preferred_language || "en"}
+      value={authUser?.preferred_language || "en-US"}
       onChange={handleChange}
       className="
               border

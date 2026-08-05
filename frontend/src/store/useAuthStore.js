@@ -11,7 +11,7 @@ const BASE_URL =
 
 export const useAuthStore = create((set, get) => ({
   authUser: null,
-  preferredLanguage: "en",
+  preferredLanguage: "en-US",
   isCheckingAuth: true,
   socket: null,
   onlineUsers: [],
@@ -120,7 +120,7 @@ export const useAuthStore = create((set, get) => ({
 
     set({
       authUser: null,
-      preferredLanguage: "en",
+      preferredLanguage: "en-US",
       socket: null,
     });
   },

@@ -3,7 +3,7 @@ import { ulid } from "ulid";
 
 export async function getMessagesByConversation(
   conversationId,
-  language = "en",
+  language = "en-US",
 ) {
   const result = await query(
     `
