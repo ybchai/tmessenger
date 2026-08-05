@@ -45,27 +45,64 @@ export const useChatStore = create((set, get) => ({
   // CONVERSATIONS
   createConversation: async (userId) => {
     try {
-      const res = await axiosInstance.post("/conversations", {
-        userId,
-      });
+      const res = await axiosInstance.post("/conversations", { userId });
 
-      const conversationId = res.data.conversationId;
+      const conversation = res.data;
 
-      await get().getConversations();
+      set((state) => ({
+        conversations: state.conversations.map((conv) => {
+          if (conv.isTemporary && conv.other_user.id === userId) {
+            return conversation;
+          }
 
-      set({
-        activeConversationId: conversationId,
-      });
+          return conv;
+        }),
 
-      return conversationId;
+        activeConversationId: conversation.conversationId,
+
+        selectedConversation: conversation,
+      }));
+
+      return conversation.conversationId;
     } catch (error) {
-      console.error(
-        "Create conversation failed:",
-        error.response?.data || error.message,
-      );
-
+      console.error(error);
       return null;
     }
+  },
+
+  createTemporaryConversation: (user) => {
+    const existing = get().conversations.find(
+      (conv) => conv.isTemporary && conv.other_user.id === user.id,
+    );
+
+    if (existing) {
+      set({
+        activeConversationId: existing.conversation_id,
+
+        selectedConversation: existing,
+
+        messages: [],
+      });
+
+      return;
+    }
+
+    const tempConversation = {
+      conversation_id: `temp-${user.id}`,
+      isTemporary: true,
+      other_user: user,
+      latest_message: null,
+    };
+
+    set((state) => ({
+      conversations: [tempConversation, ...state.conversations],
+
+      activeConversationId: tempConversation.conversation_id,
+
+      selectedConversation: tempConversation,
+
+      messages: [],
+    }));
   },
 
   getConversations: async () => {
@@ -100,10 +137,41 @@ export const useChatStore = create((set, get) => ({
   // SEND MESSAGE
   sendMessage: async ({ conversationId, data }) => {
     try {
-      const res = await axiosInstance.post(`/messages/${conversationId}`, data);
+      let realConversationId = conversationId;
+
+      const conversation = get().conversations.find(
+        (c) => c.conversation_id === conversationId,
+      );
+
+      // Temporary conversation
+      if (conversation?.isTemporary) {
+        realConversationId = await get().createConversation(
+          conversation.other_user.id,
+        );
+
+        if (!realConversationId) {
+          throw new Error("Failed to create conversation");
+        }
+      }
+
+      const res = await axiosInstance.post(
+        `/messages/${realConversationId}`,
+        data,
+      );
 
       set((state) => ({
         messages: [...state.messages, res.data],
+
+        conversations: state.conversations.map((conv) => {
+          if (conv.conversation_id === realConversationId) {
+            return {
+              ...conv,
+              latest_message: res.data,
+            };
+          }
+
+          return conv;
+        }),
       }));
 
       return true;
@@ -160,10 +228,15 @@ export const useChatStore = create((set, get) => ({
   },
 
   setActiveConversationId: (conversationId) => {
-    set({
+    set((state) => ({
       activeConversationId: conversationId,
+
+      selectedConversation: state.conversations.find(
+        (conv) => conv.conversation_id === conversationId,
+      ),
+
       messages: [],
-    });
+    }));
   },
 
   // UI
