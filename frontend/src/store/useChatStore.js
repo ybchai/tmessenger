@@ -163,56 +163,12 @@ export const useChatStore = create((set, get) => ({
         isSendingMessage: true,
       });
 
-      let realConversationId = conversationId;
-
-      const conversation = get().conversations.find(
-        (c) => c.conversation_id === conversationId,
-      );
-
-      if (conversation?.isTemporary) {
-        realConversationId = await get().createConversation(
-          conversation.other_user.id,
-        );
-
-        if (!realConversationId) {
-          throw new Error("Failed to create conversation");
-        }
-      }
-
-      const res = await axiosInstance.post(
-        `/messages/${realConversationId}`,
-        data,
-      );
-
-      const message = res.data;
-
-      const currentUser = useAuthStore.getState().authUser;
-
-      set((state) => ({
-        messages: [
-          ...state.messages,
-
-          {
-            id: message.id,
-
-            role: message.sender_id === currentUser?.id ? "me" : "other",
-
-            text: message.text,
-
-            time: new Date(message.created_at).toLocaleTimeString([], {
-              hour: "2-digit",
-              minute: "2-digit",
-            }),
-          },
-        ],
-      }));
+      await axiosInstance.post(`/messages/${conversationId}`, data);
 
       return true;
     } catch (error) {
-      console.error("Send message error:", error.message);
-
+      console.error(error);
       toast.error("Failed to send message");
-
       return false;
     } finally {
       set({

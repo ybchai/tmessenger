@@ -18,21 +18,17 @@ export const useAuthStore = create((set, get) => ({
 
   // Connect socket after PostgreSQL user is loaded
   connectSocket: (user, token) => {
-    const existingSocket = get().socket;
+    const oldSocket = get().socket;
 
-    if (existingSocket) {
-      console.log("Socket already exists");
-      return;
+    if (oldSocket) {
+      oldSocket.disconnect();
+      console.log("Old socket disconnected");
     }
 
     if (!user?.id || !token) {
       console.error("Invalid socket auth", { user, token });
       return;
     }
-
-    console.log("Connecting socket with user:", user.id);
-    console.log("Token length:", token.length);
-    console.log("Token prefix:", token.substring(0, 20) + "...");
 
     const socket = io(BASE_URL, {
       auth: {
@@ -43,11 +39,6 @@ export const useAuthStore = create((set, get) => ({
 
     socket.on("connect", () => {
       console.log("Socket connected:", socket.id);
-    });
-
-    socket.on("connect_error", (error) => {
-      console.error("Socket connection error:", error.message);
-      console.error("Full error:", error);
     });
 
     socket.on("disconnect", () => {

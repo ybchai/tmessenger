@@ -11,7 +11,7 @@ import AuthPage from "./pages/AuthPage";
 
 import PageLoader from "./components/PageLoader";
 
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 
 import { Toaster } from "react-hot-toast";
 
@@ -25,6 +25,12 @@ function App() {
   useEffect(() => {
     async function authenticate() {
       if (!isLoaded) return;
+
+      if (hasAuthenticated.current) {
+        return;
+      }
+
+      hasAuthenticated.current = true;
 
       console.log("APP EFFECT RUN");
 
@@ -49,7 +55,7 @@ function App() {
     }
 
     authenticate();
-  }, [isLoaded, isSignedIn]);
+  }, [isLoaded, isSignedIn, getToken]);
 
   if (!isLoaded || (isSignedIn && isCheckingAuth)) {
     return <PageLoader />;
