@@ -30,6 +30,10 @@ export const useAuthStore = create((set, get) => ({
       return;
     }
 
+    console.log("Connecting socket with user:", user.id);
+    console.log("Token length:", token.length);
+    console.log("Token prefix:", token.substring(0, 20) + "...");
+
     const socket = io(BASE_URL, {
       auth: {
         token,
@@ -44,6 +48,7 @@ export const useAuthStore = create((set, get) => ({
 
     socket.on("connect_error", (error) => {
       console.error("Socket connection error:", error.message);
+      console.error("Full error:", error);
     });
 
     socket.on("disconnect", () => {
