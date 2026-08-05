@@ -78,36 +78,21 @@ export const useChatStore = create((set, get) => ({
   },
 
   createTemporaryConversation: (user) => {
-    const existing = get().conversations.find(
-      (conv) => conv.isTemporary && conv.other_user.id === user.id,
-    );
-
-    if (existing) {
-      set({
-        activeConversationId: existing.conversation_id,
-
-        selectedConversation: existing,
-
-        messages: [],
-      });
-
-      return;
-    }
-
     const tempConversation = {
       conversation_id: `temp-${user.id}`,
+      conversation_type: "direct",
+      other_user_id: user.id,
+      full_name: user.full_name,
+      profile_pic: user.profile_pic,
+      last_message: null,
+      last_message_at: null,
       isTemporary: true,
-      other_user: user,
-      latest_message: null,
     };
 
     set((state) => ({
       conversations: [tempConversation, ...state.conversations],
-
       activeConversationId: tempConversation.conversation_id,
-
       selectedConversation: tempConversation,
-
       messages: [],
     }));
   },

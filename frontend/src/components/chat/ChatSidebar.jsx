@@ -14,26 +14,22 @@ import { ConversationRow } from "./ConversationRow";
 import { useEffect } from "react";
 
 function mapConversation(conversation) {
-  const peer = conversation.peer || conversation.other_user;
-
-  if (!peer) {
-    return null;
-  }
-
   return {
-    id: conversation.id || conversation.conversation_id,
-    name: peer.full_name || peer.name,
-    avatarUrl: peer.profile_pic || peer.avatarUrl,
-    initials: getInitials(peer.full_name || peer.name),
+    id: conversation.conversation_id,
+    name: conversation.full_name,
+    avatarUrl: conversation.profile_pic,
+    initials: getInitials(conversation.full_name),
 
     peer: {
-      id: peer.id,
-      name: peer.full_name || peer.name,
-      avatarUrl: peer.profile_pic || peer.avatarUrl,
-      initials: getInitials(peer.full_name || peer.name),
+      id: conversation.other_user_id,
+      name: conversation.full_name,
+      avatarUrl: conversation.profile_pic,
+      initials: getInitials(conversation.full_name),
     },
 
-    isTemporary: conversation.isTemporary,
+    lastMessage: conversation.last_message,
+    lastMessageAt: conversation.last_message_at,
+    conversationType: conversation.conversation_type,
   };
 }
 
