@@ -39,7 +39,6 @@ export const useAuthStore = create((set, get) => ({
         token,
       },
       withCredentials: true,
-      transports: ["polling"],
     });
 
     socket.on("connect", () => {
@@ -55,7 +54,10 @@ export const useAuthStore = create((set, get) => ({
       console.log("Socket disconnected");
     });
 
-    set({ socket });
+    set({
+      socket,
+      authUser: user,
+    });
   },
 
   checkAuth: async () => {
@@ -64,11 +66,18 @@ export const useAuthStore = create((set, get) => ({
 
       const user = res.data;
 
-      console.log("CHECK AUTH");
+      set({
+        authUser: user,
+        isCheckingAuth: false,
+      });
 
       return user;
     } catch (error) {
-      console.error(error);
+      set({
+        authUser: null,
+        isCheckingAuth: false,
+      });
+
       return null;
     }
   },

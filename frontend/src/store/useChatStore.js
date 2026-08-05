@@ -128,7 +128,7 @@ export const useChatStore = create((set, get) => ({
 
       console.log("RAW MESSAGES:", res.data);
 
-      const currentUser = useAuthStore.getState().user;
+      const currentUser = useAuthStore.getState().authUser;
 
       console.log("CURRENT USER:", currentUser);
 
@@ -186,7 +186,7 @@ export const useChatStore = create((set, get) => ({
 
       const message = res.data;
 
-      const currentUser = useAuthStore.getState().user;
+      const currentUser = useAuthStore.getState().authUser;
 
       set((state) => ({
         messages: [
