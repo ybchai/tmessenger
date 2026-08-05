@@ -22,6 +22,8 @@ function App() {
 
   const isCheckingAuth = useAuthStore((state) => state.isCheckingAuth);
 
+  const hasAuthenticated = useRef(false);
+
   useEffect(() => {
     async function authenticate() {
       if (!isLoaded) return;
