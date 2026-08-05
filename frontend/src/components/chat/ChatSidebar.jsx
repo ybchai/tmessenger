@@ -305,6 +305,7 @@ function ChatSidebar() {
                 user={conversation}
                 selected={conversation.id === activeConversationId}
                 onSelect={() => {
+                  console.log("selected conversation:", conversation.id)
                   setActiveConversationId(conversation.id);
                 }}
               />

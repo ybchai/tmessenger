@@ -128,13 +128,20 @@ export const useChatStore = create((set, get) => ({
         isMessagesLoading: true,
       });
 
+      console.log("Fetching messages for:", conversationId);
+
       const res = await axiosInstance.get(`/messages/${conversationId}`);
+
+      console.log("Messages received:", res.data);
 
       set({
         messages: res.data,
       });
     } catch (error) {
-      console.error("Get messages error:", error.message);
+      console.error(
+        "Get messages error:",
+        error.response?.data || error.message,
+      );
     } finally {
       set({
         isMessagesLoading: false,
@@ -234,20 +241,16 @@ export const useChatStore = create((set, get) => ({
   },
 
   setActiveConversationId: async (conversationId) => {
-    const conversation = get().conversations.find(
-      (c) => c.conversation_id === conversationId,
-    );
-
     set({
       activeConversationId: conversationId,
       messages: [],
     });
 
-    if (conversation?.isTemporary) {
-      return;
-    }
-
+    // Load old messages
     await get().getMessages(conversationId);
+
+    // Join socket room for new messages
+    get().subscribeToMessages(conversationId);
   },
 
   // UI
