@@ -18,6 +18,7 @@ export const useChatStore = create((set, get) => ({
   isUsersLoading: false,
   isMessagesLoading: false,
   isSendingMedia: false,
+  isSendingMessage: false,
 
   // USERS
   getUsers: async () => {
@@ -137,13 +138,16 @@ export const useChatStore = create((set, get) => ({
   // SEND MESSAGE
   sendMessage: async ({ conversationId, data }) => {
     try {
+      set({
+        isSendingMessage: true,
+      });
+
       let realConversationId = conversationId;
 
       const conversation = get().conversations.find(
         (c) => c.conversation_id === conversationId,
       );
 
-      // Temporary conversation
       if (conversation?.isTemporary) {
         realConversationId = await get().createConversation(
           conversation.other_user.id,
@@ -162,16 +166,7 @@ export const useChatStore = create((set, get) => ({
       set((state) => ({
         messages: [...state.messages, res.data],
 
-        conversations: state.conversations.map((conv) => {
-          if (conv.conversation_id === realConversationId) {
-            return {
-              ...conv,
-              latest_message: res.data,
-            };
-          }
-
-          return conv;
-        }),
+        activeConversationId: realConversationId,
       }));
 
       return true;
@@ -181,6 +176,10 @@ export const useChatStore = create((set, get) => ({
       toast.error("Failed to send message");
 
       return false;
+    } finally {
+      set({
+        isSendingMessage: false,
+      });
     }
   },
 
@@ -266,19 +265,16 @@ export const useChatStore = create((set, get) => ({
       return false;
     }
 
+    set({
+      composerText: "",
+    });
+
     const success = await get().sendMessage({
       conversationId,
-
       data: {
         text,
       },
     });
-
-    if (success) {
-      set({
-        composerText: "",
-      });
-    }
 
     return success;
   },

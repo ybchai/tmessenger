@@ -14,22 +14,26 @@ import { ConversationRow } from "./ConversationRow";
 import { useEffect } from "react";
 
 function mapConversation(conversation) {
-  if (!conversation.peer) {
+  const peer = conversation.peer || conversation.other_user;
+
+  if (!peer) {
     return null;
   }
 
   return {
-    id: conversation.id,
-    name: conversation.peer.full_name,
-    avatarUrl: conversation.peer.profile_pic,
-    initials: getInitials(conversation.peer.full_name),
+    id: conversation.id || conversation.conversation_id,
+    name: peer.full_name || peer.name,
+    avatarUrl: peer.profile_pic || peer.avatarUrl,
+    initials: getInitials(peer.full_name || peer.name),
 
     peer: {
-      id: conversation.peer.id,
-      name: conversation.peer.full_name,
-      avatarUrl: conversation.peer.profile_pic,
-      initials: getInitials(conversation.peer.full_name),
+      id: peer.id,
+      name: peer.full_name || peer.name,
+      avatarUrl: peer.profile_pic || peer.avatarUrl,
+      initials: getInitials(peer.full_name || peer.name),
     },
+
+    isTemporary: conversation.isTemporary,
   };
 }
 
@@ -56,7 +60,9 @@ function ChatSidebar() {
 
   const searchUsers = useChatStore((state) => state.searchUsers);
 
-  const createConversation = useChatStore((state) => state.createConversation);
+  const createTemporaryConversation = useChatStore(
+    (state) => state.createTemporaryConversation,
+  );
 
   const searchQuery = useChatStore((state) => state.searchQuery);
 
@@ -294,7 +300,7 @@ function ChatSidebar() {
           ) : (
             filteredConversations.map((conversation) => (
               <ConversationRow
-                key={conversation.id}
+                key={conversation.id || conversation.peer.id}
                 user={conversation}
                 selected={conversation.id === activeConversationId}
                 onSelect={() => {
@@ -332,12 +338,8 @@ function ChatSidebar() {
                 key={user.id}
                 user={user}
                 selected={false}
-                onSelect={async () => {
-                  const conversationId = await createConversation(user.id);
-
-                  if (conversationId) {
-                    setActiveConversationId(conversationId);
-                  }
+                onSelect={() => {
+                  createTemporaryConversation(user);
                 }}
               />
             ))

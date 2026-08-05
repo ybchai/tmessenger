@@ -15,6 +15,8 @@ export function ChatComposer() {
 
   const sendTextMessage = useChatStore((state) => state.sendTextMessage);
 
+  const isSendingMessage = useChatStore((state) => state.isSendingMessage);
+
   const { activeConversationId } = useSelectedConversation();
 
   const mediaInputRef = useRef();
