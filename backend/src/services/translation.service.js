@@ -1,39 +1,41 @@
 import * as deepl from "deepl-node";
 
+const translator = new deepl.Translator(process.env.DEEPL_API_KEY);
 
-const translator = new deepl.Translator(
-    process.env.DEEPL_API_KEY
-);
+// Map your app's language codes to DeepL language codes
+const deeplLanguageMap = {
+  en: "EN-US",
+  ja: "JA",
+  ko: "KO",
+  zh: "ZH",
+  fr: "FR",
+  de: "DE",
+  es: "ES",
+  it: "IT",
+  pt: "PT-PT",
+  ru: "RU",
+  nl: "NL",
+  pl: "PL",
+};
 
+export async function translateText(text, targetLanguage) {
+  try {
+    // Convert app language code to DeepL language code
+    const deeplTarget = deeplLanguageMap[targetLanguage] || targetLanguage;
 
-export async function translateText(
-    text,
-    targetLanguage
-) {
+    const result = await translator.translateText(
+      text,
+      null, // Auto-detect source language
+      deeplTarget,
+    );
 
-    try {
+    return {
+      translatedText: result.text,
+      detectedLanguage: result.detectedSourceLang,
+    };
+  } catch (error) {
+    console.error("DeepL translation error:", error);
 
-        const result = await translator.translateText(
-            text,
-            null, // auto detect source language
-            targetLanguage
-        );
-
-
-        return {
-            translatedText: result.text,
-            detectedLanguage: result.detectedSourceLang,
-        };
-
-
-    } catch(error){
-
-        console.error(
-            "DeepL translation error:",
-            error
-        );
-
-        throw error;
-    }
+    throw error;
+  }
 }
-

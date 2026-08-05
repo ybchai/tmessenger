@@ -1,7 +1,8 @@
 export const languages = [
   {
-    code: "en-US",
+    code: "en",
     name: "English",
+    deeplCode: "EN-US",
   },
   {
     code: "ms",
@@ -10,25 +11,16 @@ export const languages = [
   {
     code: "ja",
     name: "Japanese",
+    deeplCode: "JA",
   },
   {
     code: "zh",
     name: "Chinese",
+    deeplCode: "ZH",
   },
   {
     code: "ko",
     name: "Korean",
-  },
-  {
-    code: "fr",
-    name: "French",
-  },
-  {
-    code: "de",
-    name: "German",
-  },
-  {
-    code: "es",
-    name: "Spanish",
+    deeplCode: "KO",
   },
 ];

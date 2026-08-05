@@ -26,16 +26,18 @@ export function ChatComposer() {
   return (
     <footer
       className="
-border-t
-border-border
-p-2
-"
+      w-full
+      border-t
+      border-border
+      p-2
+      "
     >
       <div
         className="
-flex
-gap-2
-"
+        flex
+        w-full
+        gap-2
+        "
       >
         <input ref={mediaInputRef} type="file" className="hidden" />
 
