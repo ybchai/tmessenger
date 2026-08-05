@@ -126,12 +126,16 @@ export const useChatStore = create((set, get) => ({
     try {
       const res = await axiosInstance.get(`/messages/${conversationId}`);
 
+      console.log("RAW MESSAGES:", res.data);
+
       const currentUser = useAuthStore.getState().user;
+
+      console.log("CURRENT USER:", currentUser);
 
       const mappedMessages = res.data.map((message) => ({
         id: message.id,
 
-        role: message.sender_id === currentUser.id ? "me" : "other",
+        role: message.sender?.id === currentUser?.id ? "me" : "other",
 
         text: message.text,
 
@@ -191,7 +195,7 @@ export const useChatStore = create((set, get) => ({
           {
             id: message.id,
 
-            role: message.sender_id === currentUser.id ? "me" : "other",
+            role: message.sender?.id === currentUser?.id ? "me" : "other",
 
             text: message.text,
 
