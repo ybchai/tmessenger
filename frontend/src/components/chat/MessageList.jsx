@@ -14,6 +14,8 @@ export function MessageList() {
 
   const messages = useChatStore((state) => state.messages);
 
+  console.log(JSON.stringify(messages[0], null, 2));
+
   console.log("MESSAGE LIST RENDER", messages);
 
   const lastMessageId = messages.at(-1)?.id;

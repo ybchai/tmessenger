@@ -9,6 +9,8 @@ export function MessageBubble({ message }) {
   const hasImage = Boolean(message.imageUrl);
   const hasVideo = Boolean(message.videoUrl);
 
+  console.log("BUBBLE", message);
+  
   return (
     <div className={`flex w-full ${isOwnMessage ? "justify-end" : "justify-start"}`}>
       <div
