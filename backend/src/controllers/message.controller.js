@@ -84,10 +84,34 @@ export async function sendMessage(req, res) {
       videoUrl,
     });
 
-    console.log("Message created:", message);
+    await updateConversationTimestamp(conversationId);
 
+    // Create translation
+    if (text) {
+      try {
+        targetLanguage = await getReceiverLanguage(conversationId, senderId);
+
+        if (targetLanguage && targetLanguage.toLowerCase() !== sourceLanguage) {
+          const translation = await translateText(text, targetLanguage);
+
+          translatedText = translation.translatedText;
+
+          await createTranslation({
+            messageId: message.id,
+            languageCode: targetLanguage.toLowerCase(),
+            translatedText,
+          });
+        }
+      } catch (error) {
+        console.error("Translation failed:", error.message);
+      }
+    }
+
+    // NOW emit
     const socketMessage = {
       id: message.id,
+
+      conversation_id: message.conversation_id,
 
       sender_id: message.sender_id,
 
@@ -106,61 +130,9 @@ export async function sendMessage(req, res) {
       video_url: message.video_url,
     };
 
-    const receiverSocketId = userSocketMap.get(receiverId);
+    io.to(conversationId).emit("receive_message", socketMessage);
 
-    if (receiverSocketId) {
-      io.to(receiverSocketId).emit("receive_message", socketMessage);
-    }
-    await updateConversationTimestamp(conversationId);
-
-    // Create translation
-    if (text) {
-      try {
-        targetLanguage = await getReceiverLanguage(conversationId, senderId);
-
-        console.log("Receiver language:", targetLanguage);
-
-        if (targetLanguage && targetLanguage.toLowerCase() !== sourceLanguage) {
-          const translation = await translateText(text, targetLanguage);
-
-          translatedText = translation.translatedText;
-
-          await createTranslation({
-            messageId: message.id,
-            languageCode: targetLanguage.toLowerCase(),
-            translatedText,
-          });
-
-          console.log("Translation saved");
-        } else {
-          console.log("Skipping translation - same language");
-        }
-      } catch (error) {
-        console.error("Translation failed:", error.message);
-      }
-    }
-
-    const formattedMessage = {
-      id: message.id,
-
-      originalText: message.original_text,
-      translatedText,
-
-      sourceLanguage,
-      targetLanguage,
-
-      imageUrl: message.image_url,
-      videoUrl: message.video_url,
-
-      time: new Date(message.created_at).toLocaleTimeString([], {
-        hour: "2-digit",
-        minute: "2-digit",
-      }),
-    };
-
-    io.to(conversationId).emit("receive_message", formattedMessage);
-
-    res.status(201).json(formattedMessage);
+    res.status(201).json(socketMessage);
   } catch (error) {
     console.error("Send message error:", error.message);
 
