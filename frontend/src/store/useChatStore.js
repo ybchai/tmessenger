@@ -4,6 +4,25 @@ import { axiosInstance } from "../lib/axios";
 import { useAuthStore } from "./useAuthStore";
 import toast from "react-hot-toast";
 
+// Shared mapper: converts a raw DB/socket row (snake_case) into the shape
+// MessageBubble expects (camelCase + computed "role"/"time").
+function mapMessage(message, currentUserId) {
+  return {
+    id: message.id,
+    role: message.sender_id === currentUserId ? "me" : "other",
+    originalText: message.original_text,
+    translatedText: message.translated_text,
+    sourceLanguage: message.source_language,
+    targetLanguage: message.target_language,
+    time: new Date(message.created_at).toLocaleTimeString([], {
+      hour: "2-digit",
+      minute: "2-digit",
+    }),
+    imageUrl: message.image_url,
+    videoUrl: message.video_url,
+  };
+}
+
 export const useChatStore = create((set, get) => ({
   users: [],
   conversations: [],
@@ -133,25 +152,9 @@ export const useChatStore = create((set, get) => ({
 
       console.log("CURRENT USER:", currentUser);
 
-      const mappedMessages = res.data.map((message) => ({
-        id: message.id,
-
-        role: message.sender_id === currentUser?.id ? "me" : "other",
-
-        originalText: message.original_text,
-        translatedText: message.translated_text,
-
-        sourceLanguage: message.source_language,
-        targetLanguage: message.target_language,
-
-        time: new Date(message.created_at).toLocaleTimeString([], {
-          hour: "2-digit",
-          minute: "2-digit",
-        }),
-
-        imageUrl: message.image_url,
-        videoUrl: message.video_url,
-      }));
+      const mappedMessages = res.data.map((message) =>
+        mapMessage(message, currentUser?.id),
+      );
 
       console.log("FIRST MAPPED");
       console.log(mappedMessages[0]);
@@ -167,14 +170,13 @@ export const useChatStore = create((set, get) => ({
   // SEND MESSAGE
   sendMessage: async ({ conversationId, data }) => {
     try {
-      set({
-        isSendingMessage: true,
-      });
+      set({ isSendingMessage: true });
 
       const res = await axiosInstance.post(`/messages/${conversationId}`, data);
+      const currentUser = useAuthStore.getState().authUser;
 
       set((state) => ({
-        messages: [...state.messages, res.data],
+        messages: [...state.messages, mapMessage(res.data, currentUser?.id)],
       }));
 
       return true;
@@ -183,25 +185,22 @@ export const useChatStore = create((set, get) => ({
       toast.error("Failed to send message");
       return false;
     } finally {
-      set({
-        isSendingMessage: false,
-      });
+      set({ isSendingMessage: false });
     }
   },
 
   // SOCKET LISTENER
   subscribeToMessages: (conversationId) => {
     const socket = useAuthStore.getState().socket;
-
     if (!socket) return;
 
     socket.emit("join_conversation", conversationId);
-
     socket.off("receive_message");
 
     socket.on("receive_message", (message) => {
+      const currentUser = useAuthStore.getState().authUser;
       set((state) => ({
-        messages: [...state.messages, message],
+        messages: [...state.messages, mapMessage(message, currentUser?.id)],
       }));
     });
   },
