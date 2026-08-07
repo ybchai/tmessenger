@@ -242,15 +242,18 @@ export const useChatStore = create((set, get) => ({
   },
 
   setActiveConversationId: async (conversationId) => {
+    const conversation = get().conversations.find(
+      (conv) => conv.conversation_id === conversationId,
+    );
+
     set({
       activeConversationId: conversationId,
+      selectedConversation: conversation,
       messages: [],
     });
 
-    // Load old messages
     await get().getMessages(conversationId);
 
-    // Join socket room for new messages
     get().subscribeToMessages(conversationId);
   },
 

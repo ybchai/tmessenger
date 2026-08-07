@@ -12,6 +12,10 @@ export function MessageList() {
   const { activeConversation, activeConversationId } =
     useSelectedConversation();
 
+  console.log("ACTIVE CONVERSATION:", activeConversation);
+
+  console.log("ACTIVE ID:", activeConversationId);
+
   const messages = useChatStore((state) => state.messages);
 
   console.log(JSON.stringify(messages[0], null, 2));
@@ -49,7 +53,6 @@ export function MessageList() {
             <div key={message.id}>
               TEST:
               {message.originalText}
-
             </div>
           ))}
         </div>

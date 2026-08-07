@@ -5,18 +5,6 @@ import { MessageVideo } from "./MessageVideo";
 const IMAGE_TRANSFORM = "q-auto,w-640,f-auto";
 
 export function MessageBubble({ message }) {
-
-
-  console.log("BUBBLE", message);
-
-  return(
-    <div>
-      TEST BUBBLE:
-      {message.originalText}
-    </div>
-  )
-
-  /*
   const isOwnMessage = message.role === "me";
   const hasImage = Boolean(message.imageUrl);
   const hasVideo = Boolean(message.videoUrl);
@@ -62,5 +50,4 @@ export function MessageBubble({ message }) {
       </div>
     </div>
   );
-  */
 }
