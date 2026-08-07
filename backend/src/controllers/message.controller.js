@@ -37,6 +37,8 @@ export async function sendMessage(req, res) {
 
     let imageUrl = null;
     let videoUrl = null;
+    let targetLanguage = null;
+    let translatedText = null;
 
     if (req.file) {
       if (!hasImageKitConfig()) {
@@ -87,20 +89,19 @@ export async function sendMessage(req, res) {
     // Create translation
     if (text) {
       try {
-        const targetLanguage = await getReceiverLanguage(
-          conversationId,
-          senderId,
-        );
+        targetLanguage = await getReceiverLanguage(conversationId, senderId);
 
         console.log("Receiver language:", targetLanguage);
 
         if (targetLanguage && targetLanguage.toLowerCase() !== sourceLanguage) {
           const translation = await translateText(text, targetLanguage);
 
+          translatedText = translation.translatedText;
+
           await createTranslation({
             messageId: message.id,
             languageCode: targetLanguage.toLowerCase(),
-            translatedText: translation.translatedText,
+            translatedText,
           });
 
           console.log("Translation saved");
@@ -114,16 +115,21 @@ export async function sendMessage(req, res) {
 
     const formattedMessage = {
       id: message.id,
+
       originalText: message.original_text,
-      translatedText: null,
-      sourceLanguage: message.source_language,
-      targetLanguage: null,
+      translatedText,
+
+      sourceLanguage,
+      targetLanguage,
+
       imageUrl: message.image_url,
       videoUrl: message.video_url,
+
       time: new Date(message.created_at).toLocaleTimeString([], {
         hour: "2-digit",
         minute: "2-digit",
       }),
+
       role: message.sender_id === senderId ? "me" : "other",
     };
 

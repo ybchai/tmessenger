@@ -171,7 +171,11 @@ export const useChatStore = create((set, get) => ({
         isSendingMessage: true,
       });
 
-      await axiosInstance.post(`/messages/${conversationId}`, data);
+      const res = await axiosInstance.post(`/messages/${conversationId}`, data);
+
+      set((state) => ({
+        messages: [...state.messages, res.data],
+      }));
 
       return true;
     } catch (error) {
