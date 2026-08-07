@@ -15,6 +15,10 @@ export function registerMessageSocket(io, socket) {
 
         originalText: text,
 
+        sourceLanguage: null,
+
+        targetLanguage: null,
+
         imageUrl: null,
 
         videoUrl: null,
