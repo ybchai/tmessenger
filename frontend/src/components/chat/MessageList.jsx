@@ -49,6 +49,7 @@ export function MessageList() {
             <div key={message.id}>
               TEST:
               {message.originalText}
+
             </div>
           ))}
         </div>
