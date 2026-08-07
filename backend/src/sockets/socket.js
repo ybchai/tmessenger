@@ -38,4 +38,19 @@ io.on("connection", (socket) => {
   });
 });
 
-export { app, server, io };
+const userSocketMap = new Map();
+
+io.on("connection", (socket)=>{
+
+  const userId = socket.user.id;
+
+  userSocketMap.set(userId, socket.id);
+
+
+  socket.on("disconnect",()=>{
+    userSocketMap.delete(userId);
+  });
+
+});
+
+export { app, server, io, userSocketMap };

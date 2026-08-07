@@ -5,7 +5,7 @@ import {
   updateConversationTimestamp,
 } from "../repositories/message.repository.js";
 
-import { io } from "../sockets/socket.js";
+import { io, userSocketMap } from "../sockets/socket.js";
 
 import { createTranslation } from "../repositories/translation.repository.js";
 
@@ -106,7 +106,11 @@ export async function sendMessage(req, res) {
       video_url: message.video_url,
     };
 
-    socket.to(conversationId).emit("receive_message", socketMessage);
+    const receiverSocketId = userSocketMap.get(receiverId);
+
+    if (receiverSocketId) {
+      io.to(receiverSocketId).emit("receive_message", socketMessage);
+    }
     await updateConversationTimestamp(conversationId);
 
     // Create translation
