@@ -2,7 +2,7 @@ import {
   createMessage,
   updateConversationTimestamp,
 } from "../repositories/message.repository.js";
-import { translateMessage } from "../services/translation.service.js";
+import { translateText } from "../services/translation.service.js";
 
 export function registerMessageSocket(io, socket) {
   socket.on("send_message", async (data) => {
@@ -19,7 +19,7 @@ export function registerMessageSocket(io, socket) {
         videoUrl: null,
       });
 
-      const translatedMessage = await translateMessage(message);
+      const translatedMessage = await translateText(message);
 
       await updateConversationTimestamp(conversationId);
 
