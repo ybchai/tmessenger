@@ -43,7 +43,31 @@ export function useSelectedConversation() {
     activeConversation: {
       ...activeConversation,
 
-      messages,
+      messages: messages.map((message) => ({
+        id: message.id,
+
+        role:
+          String(message.sender_id) === String(authUser?.id) ? "me" : "other",
+
+        originalText: message.originalText ?? message.original_text,
+
+        translatedText: message.translatedText ?? message.translated_text,
+
+        sourceLanguage: message.sourceLanguage ?? message.source_language,
+
+        targetLanguage: message.targetLanguage ?? message.target_language,
+
+        time:
+          message.time ??
+          new Date(message.created_at).toLocaleTimeString([], {
+            hour: "2-digit",
+            minute: "2-digit",
+          }),
+
+        imageUrl: message.imageUrl ?? message.image_url,
+
+        videoUrl: message.videoUrl ?? message.video_url,
+      })),
 
       peer: {
         id: activeConversation.other_user_id,

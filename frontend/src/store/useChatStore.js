@@ -19,13 +19,13 @@ function mapMessage(message, currentUserId) {
 
     role: String(message.sender_id) === String(currentUserId) ? "me" : "other",
 
-    originalText: message.originalText ?? message.original_text,
+    originalText: message.originalText ?? message.original_text ?? "",
 
-    translatedText: message.translatedText ?? null,
+    translatedText: message.translatedText ?? message.translated_text ?? null,
 
-    sourceLanguage: message.sourceLanguage ?? message.source_language,
+    sourceLanguage: message.sourceLanguage ?? message.source_language ?? null,
 
-    targetLanguage: message.targetLanguage ?? message.target_language,
+    targetLanguage: message.targetLanguage ?? message.target_language ?? null,
 
     time:
       message.time ??
@@ -34,9 +34,9 @@ function mapMessage(message, currentUserId) {
         minute: "2-digit",
       }),
 
-    imageUrl: message.imageUrl ?? message.image_url,
+    imageUrl: message.imageUrl ?? message.image_url ?? null,
 
-    videoUrl: message.videoUrl ?? message.video_url,
+    videoUrl: message.videoUrl ?? message.video_url ?? null,
   };
 }
 

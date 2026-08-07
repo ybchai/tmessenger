@@ -85,7 +85,28 @@ export async function sendMessage(req, res) {
     });
 
     console.log("Message created:", message);
+    
+    const socketMessage = {
+      id: message.id,
 
+      sender_id: message.sender_id,
+
+      original_text: message.original_text,
+
+      translated_text: translatedText,
+
+      source_language: sourceLanguage,
+
+      target_language: targetLanguage,
+
+      created_at: message.created_at,
+
+      image_url: message.image_url,
+
+      video_url: message.video_url,
+    };
+
+    io.to(conversationId).emit("receive_message", socketMessage);
     await updateConversationTimestamp(conversationId);
 
     // Create translation

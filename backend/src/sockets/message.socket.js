@@ -1,35 +1,11 @@
-import {
-  createMessage,
-  updateConversationTimestamp,
-} from "../repositories/message.repository.js";
-import { translateText } from "../services/translation.service.js";
-
 export function registerMessageSocket(io, socket) {
-  socket.on("send_message", async (data) => {
-    try {
-      const { conversationId, text } = data;
+  socket.on("join_conversation", (conversationId) => {
+    socket.join(conversationId);
 
-      const message = await createMessage({
-        conversationId,
-        senderId: socket.user.id,
-        originalText: text,
-        sourceLanguage: null,
-        targetLanguage: null,
-        imageUrl: null,
-        videoUrl: null,
-      });
+    console.log(`${socket.user.id} joined ${conversationId}`);
+  });
 
-      const translatedMessage = await translateText(message);
-
-      await updateConversationTimestamp(conversationId);
-
-      io.to(conversationId).emit("receive_message", translatedMessage);
-    } catch (error) {
-      console.error("Socket message error:", error);
-
-      socket.emit("message_error", {
-        error: "Failed to send message",
-      });
-    }
+  socket.on("disconnect", () => {
+    console.log("Socket disconnected", socket.user.id);
   });
 }
