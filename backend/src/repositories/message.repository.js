@@ -49,6 +49,7 @@ export async function createMessage({
   conversationId,
   senderId,
   originalText,
+  sourceLanguage,
   imageUrl,
   videoUrl,
 }) {
@@ -72,7 +73,15 @@ export async function createMessage({
 
     RETURNING *
     `,
-    [messageId, conversationId, senderId, originalText, imageUrl, videoUrl],
+    [
+      messageId,
+      conversationId,
+      senderId,
+      originalText,
+      sourceLanguage,
+      imageUrl,
+      videoUrl,
+    ],
   );
 
   return result.rows[0];

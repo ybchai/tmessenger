@@ -35,12 +35,6 @@ export async function sendMessage(req, res) {
 
     const { text } = req.body;
 
-    console.log("Send message request:", {
-      conversationId,
-      senderId,
-      text,
-    });
-
     let imageUrl = null;
     let videoUrl = null;
 
@@ -60,39 +54,39 @@ export async function sendMessage(req, res) {
       }
     }
 
+    let sourceLanguage = null;
+
+    // Detect source language
+    if (text) {
+      try {
+        const detection = await translateText(text, "en");
+
+        sourceLanguage = detection.detectedLanguage?.toLowerCase();
+
+        console.log("Detected language:", sourceLanguage);
+      } catch (error) {
+        console.error("Language detection failed:", error.message);
+      }
+    }
+
     console.log("Creating message...");
 
     const message = await createMessage({
       conversationId,
       senderId,
       originalText: text,
+      sourceLanguage,
       imageUrl,
       videoUrl,
     });
 
-    const formattedMessage = {
-      id: message.id,
-      text: message.original_text,
-      imageUrl: message.image_url,
-      videoUrl: message.video_url,
-      time:  new Date(message.created_at).toLocaleTimeString([], {
-        hour: "2-digit",
-        minute: "2-digit",
-      }),
-      role: message.sender_id === senderId ? "me" : "other",
-    };
-
     console.log("Message created:", message.id);
-
-    console.log("Updating conversation timestamp...");
 
     await updateConversationTimestamp(conversationId);
 
-    // Translation should not break message sending
+    // Create translation
     if (text) {
       try {
-        console.log("Getting receiver language...");
-
         const targetLanguage = await getReceiverLanguage(
           conversationId,
           senderId,
@@ -100,30 +94,44 @@ export async function sendMessage(req, res) {
 
         console.log("Receiver language:", targetLanguage);
 
-        if (targetLanguage) {
-          console.log("Translating text...");
-
+        if (targetLanguage && targetLanguage.toLowerCase() !== sourceLanguage) {
           const translation = await translateText(text, targetLanguage);
-
-          console.log("Translation created, saving to database...");
 
           await createTranslation({
             messageId: message.id,
-            languageCode: targetLanguage,
+            languageCode: targetLanguage.toLowerCase(),
             translatedText: translation.translatedText,
           });
-        }
-      } catch (translationError) {
-        console.error("Translation failed:", translationError.message);
 
-        // Do not fail the message request
+          console.log("Translation saved");
+        } else {
+          console.log("Skipping translation - same language");
+        }
+      } catch (error) {
+        console.error("Translation failed:", error.message);
       }
     }
 
-    res.status(201).json(message);
+    const formattedMessage = {
+      id: message.id,
+      originalText: message.original_text,
+      translatedText: null,
+      sourceLanguage: message.source_language,
+      targetLanguage: null,
+      imageUrl: message.image_url,
+      videoUrl: message.video_url,
+      time: new Date(message.created_at).toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit",
+      }),
+      role: message.sender_id === senderId ? "me" : "other",
+    };
+
+    res.status(201).json(formattedMessage);
   } catch (error) {
     console.error("Send message error:", error.message);
-    console.error("Error stack:", error.stack);
+
+    console.error(error.stack);
 
     res.status(500).json({
       error: "Internal server error",
