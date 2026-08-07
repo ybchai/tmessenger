@@ -178,17 +178,12 @@ export const useChatStore = create((set, get) => ({
   // SEND MESSAGE
   sendMessage: async ({ conversationId, data }) => {
     try {
-      set({ isSendingMessage: true });
+      await axiosInstance.post(`/messages/${conversationId}`, data);
 
-      const res = await axiosInstance.post(`/messages/${conversationId}`, data);
-
-      return res.data;
+      return true;
     } catch (error) {
       console.error(error);
-      toast.error("Failed to send message");
       return false;
-    } finally {
-      set({ isSendingMessage: false });
     }
   },
 

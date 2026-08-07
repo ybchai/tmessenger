@@ -135,8 +135,6 @@ export async function sendMessage(req, res) {
       role: message.sender_id === senderId ? "me" : "other",
     };
 
-    const io = getSocket();
-
     io.to(conversationId).emit("receive_message", formattedMessage);
 
     res.status(201).json(formattedMessage);
