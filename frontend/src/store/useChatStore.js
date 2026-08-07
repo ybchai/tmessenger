@@ -187,18 +187,16 @@ export const useChatStore = create((set, get) => ({
   // SEND MESSAGE
   sendMessage: async ({ conversationId, data }) => {
     try {
-      const res = await axiosInstance.post(`/messages/${conversationId}`, data);
+      set({ isSendingMessage: true });
 
-      const message = res.data;
+      await axiosInstance.post(`/messages/${conversationId}`, data);
 
-      set((state) => ({
-        messages: [...state.messages, message],
-      }));
-
-      return message;
+      return true;
     } catch (error) {
       console.error(error);
       return false;
+    } finally {
+      set({ isSendingMessage: false });
     }
   },
 
@@ -208,28 +206,44 @@ export const useChatStore = create((set, get) => ({
 
     if (!socket) return;
 
-    socket.emit("join_conversation", conversationId);
-
-    socket.off("receive_message");
-
-    socket.on("receive_message", (message) => {
-      console.log("SOCKET MESSAGE:", message);
+    const handleMessage = (message) => {
+      console.log("RAW SOCKET:", message);
 
       const currentUser = useAuthStore.getState().authUser;
 
-      const mappedMessage = mapMessage(message, currentUser?.id);
+      const mappedMessage = mapMessage(message, currentUser.id);
 
-      set((state) => ({
-        messages: [...state.messages, mappedMessage],
-      }));
-    });
+      set((state) => {
+        const exists = state.messages.some((m) => m.id === mappedMessage.id);
+
+        if (exists) {
+          return state;
+        }
+
+        return {
+          messages: [...state.messages, mappedMessage],
+        };
+      });
+    };
+
+    // remove old listeners first
+    socket.off("receive_message");
+
+    // join new room
+    socket.emit("join_conversation", conversationId);
+
+    // add new listener
+    socket.on("receive_message", handleMessage);
   },
 
   unsubscribeFromMessages: (conversationId) => {
     const socket = useAuthStore.getState().socket;
+
     if (!socket) return;
 
     socket.emit("leave_conversation", conversationId);
+
+    socket.off("receive_message");
   },
 
   // SEARCH

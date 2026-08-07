@@ -78,7 +78,7 @@ function ChatSidebar() {
 
   const conversationList = conversations
     .map((conversation) => {
-      console.log("Sidebar state:", conversation);
+      
       return mapConversation(conversation);
     })
     .filter(Boolean);
