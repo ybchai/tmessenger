@@ -1,7 +1,5 @@
 import { useMediaQuery } from "./useMediaQuery";
-import { formatMessageTime } from "../lib/utils";
 
-import { useMemo } from "react";
 import { useChatStore } from "../store/useChatStore";
 import { useAuthStore } from "../store/useAuthStore";
 
@@ -30,7 +28,7 @@ export function useSelectedConversation() {
   const isLargeScreen = useMediaQuery("(min-width:1024px)");
 
   const activeConversation = conversations.find(
-    (conversation) => conversation.id === activeConversationId,
+    (conversation) => conversation.conversation_id === activeConversationId,
   );
 
   if (!activeConversation) {
@@ -45,32 +43,17 @@ export function useSelectedConversation() {
     activeConversation: {
       ...activeConversation,
 
-      messages: messages.map((message) => ({
-        id: message.id,
+      messages,
 
-        role:
-          String(message.sender_id) === String(authUser?.id) ? "me" : "them",
-
-        text: message.text || "",
-
-        time: formatMessageTime(message.created_at),
-
-        imageUrl: message.image_url,
-
-        videoUrl: message.video_url,
-      })),
-
-      peer: activeConversation.peer
-        ? {
-            ...activeConversation.peer,
-
-            isOnline: onlineUsers.includes(activeConversation.peer.id),
-          }
-        : null,
+      peer: {
+        id: activeConversation.other_user_id,
+        full_name: activeConversation.full_name,
+        profile_pic: activeConversation.profile_pic,
+        isOnline: onlineUsers.includes(activeConversation.other_user_id),
+      },
     },
 
     activeConversationId,
-
     isLargeScreen,
   };
 }
