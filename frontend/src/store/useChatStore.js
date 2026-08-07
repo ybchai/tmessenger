@@ -12,22 +12,24 @@ function mapMessage(message, currentUserId) {
 
     role: String(message.sender_id) === String(currentUserId) ? "me" : "other",
 
-    originalText: message.original_text ?? message.text ?? "",
+    originalText: message.originalText ?? message.original_text,
 
-    translatedText: message.translated_text ?? message.translation ?? null,
+    translatedText: message.translatedText ?? null,
 
-    sourceLanguage: message.source_language ?? null,
+    sourceLanguage: message.sourceLanguage ?? message.source_language,
 
-    targetLanguage: message.target_language ?? null,
+    targetLanguage: message.targetLanguage ?? message.target_language,
 
-    time: new Date(message.created_at ?? Date.now()).toLocaleTimeString([], {
-      hour: "2-digit",
-      minute: "2-digit",
-    }),
+    time:
+      message.time ??
+      new Date(message.created_at).toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit",
+      }),
 
-    imageUrl: message.image_url ?? null,
+    imageUrl: message.imageUrl ?? message.image_url,
 
-    videoUrl: message.video_url ?? null,
+    videoUrl: message.videoUrl ?? message.video_url,
   };
 }
 

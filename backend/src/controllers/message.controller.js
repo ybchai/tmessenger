@@ -131,8 +131,6 @@ export async function sendMessage(req, res) {
         hour: "2-digit",
         minute: "2-digit",
       }),
-
-      role: message.sender_id === senderId ? "me" : "other",
     };
 
     io.to(conversationId).emit("receive_message", formattedMessage);
