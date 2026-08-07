@@ -126,7 +126,8 @@ export const useChatStore = create((set, get) => ({
     try {
       const res = await axiosInstance.get(`/messages/${conversationId}`);
 
-      console.log("RAW MESSAGES:", res.data);
+      console.log("FIRST RAW MESSAGES:", res.data[0]);
+      console.log(JSON.stringify(res.data[0], null, 2));
 
       const currentUser = useAuthStore.getState().authUser;
 
