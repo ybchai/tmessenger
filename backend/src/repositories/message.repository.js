@@ -3,38 +3,42 @@ import { ulid } from "ulid";
 
 export async function getMessagesByConversation(
   conversationId,
-  language = "en-US",
+  language = "en",
 ) {
   const result = await query(
     `
-    SELECT
+  SELECT
 
-        m.id,
-        m.conversation_id,
-        m.sender_id,
-        m.original_text,
-        mt.translated_text,
-        mt.language_code,
-        m.image_url,
-        m.video_url,
-        m.created_at,
+      m.id,
+      m.conversation_id,
+      m.sender_id,
 
-        u.full_name AS sender_name,
-        u.profile_pic AS sender_profile_pic
+      m.original_text,
+      m.source_language,
 
-    FROM messages m
-    JOIN users u
-    ON m.sender_id = u.id
+      mt.translated_text,
+      mt.language_code AS target_language,
 
-    LEFT JOIN message_translations mt
-    ON m.id = mt.message_id
-    AND mt.language_code = $2
+      m.image_url,
+      m.video_url,
+      m.created_at,
 
-    WHERE m.conversation_id = $1
+      u.full_name AS sender_name,
+      u.profile_pic AS sender_profile_pic
 
-    ORDER BY m.created_at ASC
-    `,
+  FROM messages m
 
+  JOIN users u
+  ON m.sender_id = u.id
+
+  LEFT JOIN message_translations mt
+  ON m.id = mt.message_id
+  AND mt.language_code = $2
+
+  WHERE m.conversation_id = $1
+
+  ORDER BY m.created_at ASC
+  `,
     [conversationId, language],
   );
 
@@ -58,12 +62,13 @@ export async function createMessage({
         conversation_id,
         sender_id,
         original_text,
+        source_language,
         image_url,
         video_url
     )
 
     VALUES
-    ($1,$2,$3,$4,$5,$6)
+    ($1,$2,$3,$4,$5,$6,$7)
 
     RETURNING *
     `,
