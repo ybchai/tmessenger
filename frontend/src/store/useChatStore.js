@@ -179,10 +179,6 @@ export const useChatStore = create((set, get) => ({
         messages: [...state.messages, mapMessage(res.data, currentUser?.id)],
       }));
 
-      socket.onAny((eventName, ...args) => {
-        console.log("SOCKET EVENT:", eventName, args);
-      });
-      
       return true;
     } catch (error) {
       console.error(error);
@@ -207,10 +203,6 @@ export const useChatStore = create((set, get) => ({
       set((state) => ({
         messages: [...state.messages, mapMessage(message, currentUser?.id)],
       }));
-    });
-
-    socket.onAny((eventName, ...args) => {
-      console.log("SOCKET EVENT:", eventName, args);
     });
   },
 

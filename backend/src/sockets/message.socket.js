@@ -4,6 +4,7 @@ import {
 } from "../repositories/message.repository.js";
 
 export function registerMessageSocket(io, socket) {
+    console.log("!!! send_message RECEIVED from:", socket.user.id, data);
   socket.on("send_message", async (data) => {
     try {
       const { conversationId, text } = data;

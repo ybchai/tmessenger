@@ -30,23 +30,26 @@ export function MessageList() {
   return (
     <div
       className="
-flex
-flex-1
-overflow-hidden
-flex-col
-"
+                flex
+                flex-1
+                overflow-hidden
+                flex-col
+                "
     >
       {activeConversation ? (
         <div
           ref={messagesScrollRef}
           className="
-flex-1
-overflow-y-auto
-p-3
-"
+                flex-1
+                overflow-y-auto
+                p-3
+                "
         >
           {messages.map((message) => (
-            <MessageBubble key={message.id} message={message} />
+            <div key={message.id}>
+              TEST:
+              {message.originalText}
+            </div>
           ))}
         </div>
       ) : (
