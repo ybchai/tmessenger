@@ -5,6 +5,8 @@ import {
   updateConversationTimestamp,
 } from "../repositories/message.repository.js";
 
+import { io } from "../sockets/socket.js";
+
 import { createTranslation } from "../repositories/translation.repository.js";
 
 import { translateText } from "../services/translation.service.js";
@@ -132,6 +134,10 @@ export async function sendMessage(req, res) {
 
       role: message.sender_id === senderId ? "me" : "other",
     };
+
+    const io = getSocket();
+
+    io.to(conversationId).emit("receive_message", formattedMessage);
 
     res.status(201).json(formattedMessage);
   } catch (error) {

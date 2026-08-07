@@ -9,17 +9,25 @@ import toast from "react-hot-toast";
 function mapMessage(message, currentUserId) {
   return {
     id: message.id,
-    role: message.sender_id === currentUserId ? "me" : "other",
-    originalText: message.original_text,
-    translatedText: message.translated_text,
-    sourceLanguage: message.source_language,
-    targetLanguage: message.target_language,
-    time: new Date(message.created_at).toLocaleTimeString([], {
+
+    role: String(message.sender_id) === String(currentUserId) ? "me" : "other",
+
+    originalText: message.original_text ?? message.text ?? "",
+
+    translatedText: message.translated_text ?? message.translation ?? null,
+
+    sourceLanguage: message.source_language ?? null,
+
+    targetLanguage: message.target_language ?? null,
+
+    time: new Date(message.created_at ?? Date.now()).toLocaleTimeString([], {
       hour: "2-digit",
       minute: "2-digit",
     }),
-    imageUrl: message.image_url,
-    videoUrl: message.video_url,
+
+    imageUrl: message.image_url ?? null,
+
+    videoUrl: message.video_url ?? null,
   };
 }
 
@@ -173,13 +181,8 @@ export const useChatStore = create((set, get) => ({
       set({ isSendingMessage: true });
 
       const res = await axiosInstance.post(`/messages/${conversationId}`, data);
-      const currentUser = useAuthStore.getState().authUser;
 
-      set((state) => ({
-        messages: [...state.messages, mapMessage(res.data, currentUser?.id)],
-      }));
-
-      return true;
+      return res.data;
     } catch (error) {
       console.error(error);
       toast.error("Failed to send message");
@@ -192,16 +195,18 @@ export const useChatStore = create((set, get) => ({
   // SOCKET LISTENER
   subscribeToMessages: (conversationId) => {
     const socket = useAuthStore.getState().socket;
+
     if (!socket) return;
 
     socket.emit("join_conversation", conversationId);
+
     socket.off("receive_message");
 
     socket.on("receive_message", (message) => {
-      console.log("RAW SOCKET MESSAGE:", message);
-      const currentUser = useAuthStore.getState().authUser;
+      console.log("SOCKET MESSAGE:", message);
+
       set((state) => ({
-        messages: [...state.messages, mapMessage(message, currentUser?.id)],
+        messages: [...state.messages, message],
       }));
     });
   },
