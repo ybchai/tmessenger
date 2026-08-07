@@ -82,7 +82,7 @@ export async function sendMessage(req, res) {
       videoUrl,
     });
 
-    console.log("Message created:", message.id);
+    console.log("Message created:", message);
 
     await updateConversationTimestamp(conversationId);
 

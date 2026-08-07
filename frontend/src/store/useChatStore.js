@@ -198,6 +198,7 @@ export const useChatStore = create((set, get) => ({
     socket.off("receive_message");
 
     socket.on("receive_message", (message) => {
+      console.log("RAW SOCKET MESSAGE:", message);
       const currentUser = useAuthStore.getState().authUser;
       set((state) => ({
         messages: [...state.messages, mapMessage(message, currentUser?.id)],
