@@ -10,9 +10,11 @@ export function MessageBubble({ message }) {
   const hasVideo = Boolean(message.videoUrl);
 
   console.log("BUBBLE", message);
-  
+
   return (
-    <div className={`flex w-full ${isOwnMessage ? "justify-end" : "justify-start"}`}>
+    <div
+      className={`flex w-full ${isOwnMessage ? "justify-end" : "justify-start"}`}
+    >
       <div
         className={`max-w-[min(90%,28rem)] rounded-2xl px-3 py-2 text-[15px] leading-snug sm:max-w-[min(75%,28rem)] sm:px-3.5 ${
           isOwnMessage
@@ -28,9 +30,16 @@ export function MessageBubble({ message }) {
           />
         ) : null}
         {hasVideo ? <MessageVideo src={message.videoUrl} /> : null}
-        {message.text ? (
-          <p className="whitespace-pre-wrap wrap-break-word">{message.text}</p>
-        ) : null}
+        {message.originalText && (
+          <p className="whitespace-pre-wrap break-words">
+            {message.originalText}
+          </p>
+        )}
+
+        {message.sourceLanguage !== message.targetLanguage &&
+          message.translatedText && (
+            <p className="opacity-70">{message.translatedText}</p>
+          )}
         <p
           className={`mt-1 text-[11px] tabular-nums ${
             isOwnMessage ? "text-accent-foreground/75" : "text-muted"

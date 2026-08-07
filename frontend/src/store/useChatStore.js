@@ -138,7 +138,11 @@ export const useChatStore = create((set, get) => ({
 
         role: message.sender_id === currentUser?.id ? "me" : "other",
 
-        text: message.text,
+        originalText: message.original_text,
+        translatedText: message.translated_text,
+
+        sourceLanguage: message.source_language,
+        targetLanguage: message.target_language,
 
         time: new Date(message.created_at).toLocaleTimeString([], {
           hour: "2-digit",
