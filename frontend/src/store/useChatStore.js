@@ -3,10 +3,17 @@ import { create } from "zustand";
 import { axiosInstance } from "../lib/axios";
 import { useAuthStore } from "./useAuthStore";
 import toast from "react-hot-toast";
+import { EqualSquareIcon } from "lucide-react";
 
 // Shared mapper: converts a raw DB/socket row (snake_case) into the shape
 // MessageBubble expects (camelCase + computed "role"/"time").
 function mapMessage(message, currentUserId) {
+  console.log("COMPARE ROLE", {
+    sender: message.sender_id,
+    current: currentUserId,
+    equal: String(message.sender_id) === String(currentUserId),
+  });
+
   return {
     id: message.id,
 
@@ -202,8 +209,12 @@ export const useChatStore = create((set, get) => ({
     socket.on("receive_message", (message) => {
       console.log("SOCKET MESSAGE:", message);
 
+      const currentUser = useAuthStore.getState().authUser;
+
+      const mappedMessage = mapMessage(message, currentUser?.id);
+
       set((state) => ({
-        messages: [...state.messages, message],
+        messages: [...state.messages, mappedMessage],
       }));
     });
   },
