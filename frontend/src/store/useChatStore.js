@@ -149,6 +149,9 @@ export const useChatStore = create((set, get) => ({
         videoUrl: message.video_url,
       }));
 
+      console.log("FIRST MAPPED");
+      console.log(mappedMessages[0]);
+
       set({
         messages: mappedMessages,
       });
