@@ -85,7 +85,7 @@ export async function sendMessage(req, res) {
     });
 
     console.log("Message created:", message);
-    
+
     const socketMessage = {
       id: message.id,
 
@@ -106,7 +106,7 @@ export async function sendMessage(req, res) {
       video_url: message.video_url,
     };
 
-    io.to(conversationId).emit("receive_message", socketMessage);
+    socket.to(conversationId).emit("receive_message", socketMessage);
     await updateConversationTimestamp(conversationId);
 
     // Create translation
