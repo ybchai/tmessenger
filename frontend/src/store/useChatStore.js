@@ -206,66 +206,6 @@ export const useChatStore = create((set, get) => ({
     }
   },
 
-  sendTextMessage: async (conversationId) => {
-    const text = get().composerText.trim();
-
-    if (!conversationId || !text) {
-      return false;
-    }
-
-    let realConversationId = conversationId;
-
-    const conversation = get().conversations.find(
-      (conv) => conv.conversation_id === conversationId,
-    );
-
-    console.log("SEND CONVERSATION:", conversation);
-    console.log("SEND CONVERSATION ID:", conversationId);
-
-    // Temporary conversation
-    if (conversation?.isTemporary) {
-      console.log("TEMPORARY CONVERSATION");
-
-      const createdConversationId = await get().createConversation(
-        conversation.other_user_id,
-      );
-
-      console.log("CREATED REAL CONVERSATION:", createdConversationId);
-
-      if (!createdConversationId) {
-        console.error("Could not create real conversation");
-        return false;
-      }
-
-      // IMPORTANT
-      realConversationId = createdConversationId;
-
-      console.log("USING REAL CONVERSATION:", realConversationId);
-
-      set({
-        activeConversationId: realConversationId,
-        composerText: "",
-      });
-
-      await get().getConversations();
-      await get().getMessages(realConversationId);
-      get().subscribeToMessages(realConversationId);
-    } else {
-      set({
-        composerText: "",
-      });
-    }
-
-    console.log("FINAL MESSAGE CONVERSATION ID:", realConversationId);
-
-    return await get().sendMessage({
-      conversationId: realConversationId,
-      data: {
-        text,
-      },
-    });
-  },
-
   // SOCKET LISTENER
   subscribeToMessages: (conversationId) => {
     const socket = useAuthStore.getState().socket;
@@ -386,18 +326,57 @@ export const useChatStore = create((set, get) => ({
       return false;
     }
 
-    set({
-      composerText: "",
-    });
+    let realConversationId = conversationId;
 
-    const success = await get().sendMessage({
-      conversationId,
+    const conversation = get().conversations.find(
+      (conv) => conv.conversation_id === conversationId,
+    );
+
+    console.log("SEND CONVERSATION:", conversation);
+    console.log("SEND CONVERSATION ID:", conversationId);
+
+    // Temporary conversation
+    if (conversation?.isTemporary) {
+      console.log("TEMPORARY CONVERSATION");
+
+      const createdConversationId = await get().createConversation(
+        conversation.other_user_id,
+      );
+
+      console.log("CREATED REAL CONVERSATION:", createdConversationId);
+
+      if (!createdConversationId) {
+        console.error("Could not create real conversation");
+        return false;
+      }
+
+      // IMPORTANT
+      realConversationId = createdConversationId;
+
+      console.log("USING REAL CONVERSATION:", realConversationId);
+
+      set({
+        activeConversationId: realConversationId,
+        composerText: "",
+      });
+
+      await get().getConversations();
+      await get().getMessages(realConversationId);
+      get().subscribeToMessages(realConversationId);
+    } else {
+      set({
+        composerText: "",
+      });
+    }
+
+    console.log("FINAL MESSAGE CONVERSATION ID:", realConversationId);
+
+    return await get().sendMessage({
+      conversationId: realConversationId,
       data: {
         text,
       },
     });
-
-    return success;
   },
 
   // SEND MEDIA
