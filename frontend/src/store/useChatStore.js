@@ -185,19 +185,52 @@ export const useChatStore = create((set, get) => ({
   },
 
   // SEND MESSAGE
-  sendMessage: async ({ conversationId, data }) => {
-    try {
-      set({ isSendingMessage: true });
+  sendTextMessage: async (conversationId) => {
+    const text = get().composerText.trim();
 
-      await axiosInstance.post(`/messages/${conversationId}`, data);
+ 
 
-      return true;
-    } catch (error) {
-      console.error(error);
+    if (!conversationId || !text) {
       return false;
-    } finally {
-      set({ isSendingMessage: false });
     }
+
+    let realConversationId = conversationId;
+
+    const conversation = get().conversations.find(
+      (conv) => conv.conversation_id === conversationId,
+    );
+
+    // Temporary conversation
+    if (conversation?.isTemporary) {
+      const createdConversationId = await get().createConversation(
+        conversation.other_user_id,
+      );
+
+      if (!createdConversationId) {
+        return false;
+      }
+
+      realConversationId = createdConversationId;
+
+      set({
+        activeConversationId: realConversationId,
+      });
+
+      await get().getConversations();
+      await get().getMessages(realConversationId);
+      get().subscribeToMessages(realConversationId);
+    }
+
+    set({
+      composerText: "",
+    });
+
+    return await get().sendMessage({
+      conversationId: realConversationId,
+      data: {
+        text,
+      },
+    });
   },
 
   // SOCKET LISTENER
@@ -285,8 +318,11 @@ export const useChatStore = create((set, get) => ({
       messages: [],
     });
 
-    await get().getMessages(conversationId);
+    if (conversation?.isTemporary) {
+      return;
+    }
 
+    await get().getMessages(conversationId);
     get().subscribeToMessages(conversationId);
   },
 

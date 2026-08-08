@@ -42,6 +42,12 @@ export async function sendMessage(req, res) {
     let targetLanguage = null;
     let translatedText = null;
 
+    if (conversationId.startsWith("temp-")) {
+      return res.status(400).json({
+        error: "Cannot send messages to a temporary conversation",
+      });
+    }
+
     if (req.file) {
       if (!hasImageKitConfig()) {
         return res.status(500).json({
