@@ -90,14 +90,16 @@ export const useChatStore = create((set, get) => ({
 
       set((state) => ({
         conversations: state.conversations.map((conv) => {
-          if (conv.isTemporary && conv.other_user.id === userId) {
+          if (conv.isTemporary && conv.other_user_id === userId) {
             return {
               ...conversation,
 
-              // keep sidebar compatible
-              peer: conv.other_user,
+              conversation_id: conversation.conversationId,
 
-              id: conversation.conversationId,
+              other_user_id: conv.other_user_id,
+              full_name: conv.full_name,
+              profile_pic: conv.profile_pic,
+
               isTemporary: false,
             };
           }
@@ -108,7 +110,8 @@ export const useChatStore = create((set, get) => ({
 
       return conversation.conversationId;
     } catch (error) {
-      console.error(error);
+      console.error("Create conversation error:", error);
+
       return null;
     }
   },
@@ -185,10 +188,23 @@ export const useChatStore = create((set, get) => ({
   },
 
   // SEND MESSAGE
+  sendMessage: async ({ conversationId, data }) => {
+    try {
+      set({ isSendingMessage: true });
+
+      await axiosInstance.post(`/messages/${conversationId}`, data);
+
+      return true;
+    } catch (error) {
+      console.error("Send message error:", error);
+      return false;
+    } finally {
+      set({ isSendingMessage: false });
+    }
+  },
+
   sendTextMessage: async (conversationId) => {
     const text = get().composerText.trim();
-
- 
 
     if (!conversationId || !text) {
       return false;
