@@ -86,7 +86,7 @@ export const useChatStore = create((set, get) => ({
 
       const conversation = res.data;
 
-      console.log("created conversation:", conversation);
+      console.log("CREATE CONVERSATION RESPONSE:", conversation);
 
       set((state) => ({
         conversations: state.conversations.map((conv) => {
@@ -110,7 +110,10 @@ export const useChatStore = create((set, get) => ({
 
       return conversation.conversationId;
     } catch (error) {
-      console.error("Create conversation error:", error);
+      console.error(
+        "Create conversation error:",
+        error.response?.data || error,
+      );
 
       return null;
     }
@@ -216,30 +219,44 @@ export const useChatStore = create((set, get) => ({
       (conv) => conv.conversation_id === conversationId,
     );
 
+    console.log("SEND CONVERSATION:", conversation);
+    console.log("SEND CONVERSATION ID:", conversationId);
+
     // Temporary conversation
     if (conversation?.isTemporary) {
+      console.log("TEMPORARY CONVERSATION");
+
       const createdConversationId = await get().createConversation(
         conversation.other_user_id,
       );
 
+      console.log("CREATED REAL CONVERSATION:", createdConversationId);
+
       if (!createdConversationId) {
+        console.error("Could not create real conversation");
         return false;
       }
 
+      // IMPORTANT
       realConversationId = createdConversationId;
+
+      console.log("USING REAL CONVERSATION:", realConversationId);
 
       set({
         activeConversationId: realConversationId,
+        composerText: "",
       });
 
       await get().getConversations();
       await get().getMessages(realConversationId);
       get().subscribeToMessages(realConversationId);
+    } else {
+      set({
+        composerText: "",
+      });
     }
 
-    set({
-      composerText: "",
-    });
+    console.log("FINAL MESSAGE CONVERSATION ID:", realConversationId);
 
     return await get().sendMessage({
       conversationId: realConversationId,
