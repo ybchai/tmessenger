@@ -342,6 +342,7 @@ function ChatSidebar() {
                 selected={false}
                 onSelect={() => {
                   createTemporaryConversation(user);
+                  console.log("created temporary conversation for user:", user.id);
                 }}
               />
             ))

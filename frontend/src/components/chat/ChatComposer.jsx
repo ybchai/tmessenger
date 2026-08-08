@@ -47,7 +47,7 @@ export function ChatComposer() {
           <ImageIcon />
         </Button>
 
-        <TextArea fullWidth placeholder="Enter your message..."
+        <TextArea fullWidth
           value={composerText}
           onChange={(e) => setComposerText(e.target.value)}
           onKeyDown={(e) => {

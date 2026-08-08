@@ -5,7 +5,7 @@ import {
   updateConversationTimestamp,
 } from "../repositories/message.repository.js";
 
-import { io, userSocketMap } from "../sockets/socket.js";
+import { io } from "../sockets/socket.js";
 
 import { createTranslation } from "../repositories/translation.repository.js";
 
