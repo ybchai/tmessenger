@@ -16,6 +16,8 @@ export const useAuthStore = create(
       authUser: null,
       preferredLanguage: "en",
       isCheckingAuth: true,
+
+      // Runtime only — DO NOT persist
       socket: null,
       onlineUsers: [],
 
@@ -24,7 +26,6 @@ export const useAuthStore = create(
 
         if (oldSocket) {
           oldSocket.disconnect();
-          console.log("Old socket disconnected");
         }
 
         if (!user?.id || !token) {
@@ -85,7 +86,7 @@ export const useAuthStore = create(
 
       updatePreferredLanguage: async (language) => {
         try {
-          // Update UI immediately
+          // Update immediately
           set((state) => ({
             preferredLanguage: language,
 
@@ -97,14 +98,17 @@ export const useAuthStore = create(
               : null,
           }));
 
-          // Save to backend
+          // Save to PostgreSQL
           await axiosInstance.patch("/users/preferences", {
             preferredLanguage: language,
           });
 
           return true;
         } catch (error) {
-          console.error("Update preferred language failed:", error);
+          console.error(
+            "Update preferred language failed:",
+            error.response?.data || error.message,
+          );
 
           return false;
         }
@@ -140,6 +144,11 @@ export const useAuthStore = create(
 
     {
       name: "auth-storage",
+
+      // Only save serializable persistent data
+      partialize: (state) => ({
+        preferredLanguage: state.preferredLanguage,
+      }),
     },
   ),
 );
