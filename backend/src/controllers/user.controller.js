@@ -21,8 +21,10 @@ export async function getUsers(req, res) {
 
 export async function updatePreferredLanguage(req, res) {
   try {
-    const { userId } = req.user.id;
+    const userId = req.user.id;
     const { preferredLanguage } = req.body;
+
+    console.log("Preferred Language:", preferredLanguage);
 
     if (!preferredLanguage) {
       return res.status(400).json({
@@ -30,7 +32,7 @@ export async function updatePreferredLanguage(req, res) {
       });
     }
 
-    const user = await updatePreferredLanguageById(userId, language);
+    const user = await updatePreferredLanguageById(userId, preferredLanguage);
 
     if (!user) {
       return res.status(404).json({
