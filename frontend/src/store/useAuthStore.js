@@ -11,7 +11,7 @@ const BASE_URL =
 
 export const useAuthStore = create((set, get) => ({
   authUser: null,
-  preferredLanguage: "en-US",
+  preferredLanguage: "en",
   isCheckingAuth: true,
   socket: null,
   onlineUsers: [],
@@ -81,6 +81,15 @@ export const useAuthStore = create((set, get) => ({
 
   updatePreferredLanguage: async (language) => {
     try {
+      set((state) => ({
+        preferredLanguage: language,
+
+        authUser: {
+          ...state.authUser,
+          preferred_language: language,
+        },
+      }));
+
       await axiosInstance.patch("/users/preferences", {
         preferredLanguage: language,
       });
@@ -120,7 +129,7 @@ export const useAuthStore = create((set, get) => ({
 
     set({
       authUser: null,
-      preferredLanguage: "en-US",
+      preferredLanguage: "en",
       socket: null,
     });
   },
