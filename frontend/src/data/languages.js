@@ -7,6 +7,7 @@ export const languages = [
   {
     code: "ms",
     name: "Malay",
+    deeplCode: "MS",
   },
   {
     code: "ja",

@@ -8,14 +8,7 @@ const deeplLanguageMap = {
   ja: "JA",
   ko: "KO",
   zh: "ZH",
-  fr: "FR",
-  de: "DE",
-  es: "ES",
-  it: "IT",
-  pt: "PT-PT",
-  ru: "RU",
-  nl: "NL",
-  pl: "PL",
+  ms: "MS",
 };
 
 export async function translateText(text, targetLanguage) {
