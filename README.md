@@ -36,7 +36,7 @@ FRONTEND_URL=<http://localhost:5173 || {frontend_url from where your app is depl
 *To deploy the app on Render, upload the docker file and set up your environment variables and deploy it.*
 
 
-7. Configure Frontend Environment Variables
+6. Configure Frontend Environment Variables
 inside frontend/
 
 create:
@@ -47,7 +47,7 @@ VITE_CLERK_PUBLISHABLE_KEY=<YOUR_CLERK_PUBLISHABLE_KEY>
 *Also set this up in Render environment variables if deploying on Render
 
 
-8. Set up PostgreSQL
+7. Set up PostgreSQL
 Option A - Hosted PostgreSQL (NEON DB)
 Create a PostgreSQL database using the selected provider and obtain connection string
 
@@ -62,7 +62,7 @@ configure backend:
 DATABASE_URL=<YOUR_LOCAL_POSTGRESQL_CONNECTION>
 
 
-9. Run database migrations
+8. Run database migrations
 *Migration scripts are automatically ran when the app is deployed on Render
 
 Otherwise:
@@ -71,11 +71,11 @@ npm run migrate
 
 
 // only for local deployment
-10. Start backend
+9. Start backend
 from backend/ run: npm run dev (backend should start on http://localhost:3000
 
 
-11. Start frontend
+10. Start frontend
 navigate to frontend 
 (new terminal): 
 cd tmessenger 
