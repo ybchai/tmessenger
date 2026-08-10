@@ -34,10 +34,9 @@ export function MessageBubble({ message }) {
           </p>
         )}
 
-        {message.sourceLanguage !== message.targetLanguage &&
-          message.translatedText && (
-            <p className="opacity-70">{message.translatedText}</p>
-          )}
+        {message.translatedText && (
+          <p className="opacity-70">{message.translatedText}</p>
+        )}
         <p
           className={`mt-1 text-[11px] tabular-nums ${
             isOwnMessage ? "text-accent-foreground/75" : "text-muted"

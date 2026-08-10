@@ -1,14 +1,10 @@
 import { query } from "../database/connection.js";
 import { ulid } from "ulid";
 
-export async function getMessagesByConversation(
-  conversationId,
-  language = "en",
-) {
+export async function getMessagesByConversation(conversationId) {
   const result = await query(
     `
-  SELECT
-
+    SELECT
       m.id,
       m.conversation_id,
       m.sender_id,
@@ -26,20 +22,19 @@ export async function getMessagesByConversation(
       u.full_name AS sender_name,
       u.profile_pic AS sender_profile_pic
 
-  FROM messages m
+    FROM messages m
 
-  JOIN users u
-  ON m.sender_id = u.id
+    JOIN users u
+      ON m.sender_id = u.id
 
-  LEFT JOIN message_translations mt
-  ON m.id = mt.message_id
-  AND mt.language_code = $2
+    LEFT JOIN message_translations mt
+      ON m.id = mt.message_id
 
-  WHERE m.conversation_id = $1
+    WHERE m.conversation_id = $1
 
-  ORDER BY m.created_at ASC
-  `,
-    [conversationId, language],
+    ORDER BY m.created_at ASC
+    `,
+    [conversationId],
   );
 
   return result.rows;
