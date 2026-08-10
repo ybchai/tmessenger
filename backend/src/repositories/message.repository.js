@@ -106,17 +106,15 @@ export async function getReceiverLanguage(conversationId, senderId) {
   return result.rows[0]?.preferred_language;
 }
 
-export async function updateConversationTimestamp(conversationId) {
+export async function updateConversationTimestamp(conversationId, messageId) {
   await query(
     `
     UPDATE conversations
-
-    SET updated_at = NOW()
-
+    SET
+      updated_at = NOW(),
+      latest_message_id = $2
     WHERE id = $1
-
     `,
-
-    [conversationId],
+    [conversationId, messageId],
   );
 }

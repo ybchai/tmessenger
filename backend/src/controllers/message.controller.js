@@ -90,7 +90,7 @@ export async function sendMessage(req, res) {
       videoUrl,
     });
 
-    await updateConversationTimestamp(conversationId);
+    await updateConversationTimestamp(conversationId, message.id);
 
     // Create translation
     if (text) {
